@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1551797915412.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "844132561",
+    "id" : "8DA7F226",
+    "lastKnownWriteTime" : 1551798225,
+    "last_content_update" : 1551798225602,
+    "path" : "C:/Users/MasyutaSA/Desktop/github/stepik_r/vectors.Rmd",
+    "project_path" : "vectors.Rmd",
+    "properties" : {
+        "chunk_output_type" : "console",
+        "cursorPosition" : "28,27",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
