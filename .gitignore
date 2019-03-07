@@ -1,6 +1,7 @@
 .Rhistory
 .Rproj.user
 .RData
+._*
 _bookdown_files/*
 
 # Don't ignore all _cache, _files folders because they are needed for output in the docs folder
