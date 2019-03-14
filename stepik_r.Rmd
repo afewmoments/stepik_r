@@ -259,3 +259,24 @@ is_monotone(n)
 
 Запрограммируйте оба этих значения в виде функции, зависящей от `n` и `k`. Аргумент `with_repetitions` будет отвечать за вариант подсчёта: если он `FALSE`, то пусть считается количество сочетаний, а если `TRUE`, то сочетаний с повторениями.
 
+```{r}
+combin_count <- function(n, k, with_repretitions = FALSE) {
+if(with_repretitions == FALSE) {
+  return(factorial(n) / (factorial(k) * factorial(n-k)))
+} else {
+  return(factorial(n+k-1) / (factorial(k) * factorial(n-1)))
+}
+}
+
+n <- 5
+k <- 3
+factorial(20)
+
+combin_count(5, 3)
+factorial(5) # 120
+factorial(3) # 6
+factorial(2) # 2
+
+```
+
+
