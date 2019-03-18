@@ -599,6 +599,61 @@ diag(m)
 
 ```
 
+Функция возвращает все вектора из списка максимальной длины:
+
+```{r}
+get_longest <- function(l){
+  len <- sapply(l, length)
+  ind <- which(len == max(len))
+  list(number = ind, element = l[ind])
+}
+
+# Тестирование. Для этого делаем функцию.
+
+gen_list <- function(n_elements, max_len, seed = 111) {
+  set.seed(seed)
+  len <- sample(1:max_len, n_elements)
+  lapply(len, rnorm)
+}
+
+l1 <- gen_list(4, 10)
+get_longest(l1)
 
 
+
+```
+
+
+### Задача 4
+
+Парижане бунтуют! По слухам, Бастилия плохо охраняется, а её арсеналы полны пороха и мушкетов.
+Пришло время решительных действий. Наши агенты смогли подсчитать количество солдат в патрулях в каждой из восьми башен крепости. Вот эти данные:
+
+```{r}
+set.seed(1789)
+bastille <- list(
+  "La Chapelle Tower" = rbinom(5, 10, 1/2), 
+  "Tresor Tower" = rbinom(8, 12, 1/4), 
+  "Comte Tower" = rbinom(14, 3, 1/5) + 1,
+  "Baziniere Tower" = rbinom(8, 4, 4/5), 
+  "Bertaudiere Tower" = rbinom(4, 8, 2/3),
+  "Liberte Tower" = rbinom(1, 100, 0.1), 
+  "Puits Tower" = rbinom(5, 5, 0.7),
+  "Coin Tower" = rbinom(3, 16, 0.4)
+)
+
+count(bastille)
+get_longest(bastille)
+
+# Лентяй
+sum(unlist(bastille[1])) +
+sum(unlist(bastille[2])) +
+sum(unlist(bastille[3])) +
+sum(unlist(bastille[4])) +
+sum(unlist(bastille[5])) +
+sum(unlist(bastille[6])) +
+sum(unlist(bastille[7])) +
+sum(unlist(bastille[8]))
+
+```
 
