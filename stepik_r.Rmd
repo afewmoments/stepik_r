@@ -680,6 +680,12 @@ forceMatrixToInteger <- function(m){
 }
 
 forceMatrixToInteger(r)
-#УФф, это работает, но надо разобраться в этом
+# Господи ну и монстр
+# УФф, это работает, но надо разобраться в этом
+
+# Проще всего это делается вот так
+count_elements <- function(x) {
+rbind(sort(unique(x)),table(x))
+}
 ```
 
