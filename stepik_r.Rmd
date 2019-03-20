@@ -683,9 +683,119 @@ forceMatrixToInteger(r)
 # Господи ну и монстр
 # УФф, это работает, но надо разобраться в этом
 
-# Проще всего это делается вот так
+# Проще всего это делается вот такщ
 count_elements <- function(x) {
 rbind(sort(unique(x)),table(x))
 }
+```
+
+## Data frame
+
+### Создание
+
+```{r}
+df <- data.frame(x = 1:4, y = LETTERS[1:4], z = c(TRUE, FALSE))
+
+str(df)
+```
+
+### ДОбавление имён
+
+```{r}
+df <- data.frame(x = 1:4, y = LETTERS[1:4], z = c(TRUE, FALSE),
+                 row.names = c("FK", "SL", "EJ", "SE"))
+rownames(df)
+colnames(df)
+```
+
+### Размерности
+
+```{r}
+nrow(df)
+ncol(df)
+```
+
+Две важные особенности
+
+* `length()` возвращает кол-во столбцов, а не общее кол-во переменных
+```{r}
+length(df)
+```
+
+* `names()`  возвращает имена столбцов
+
+```{r}
+names(df)
+```
+
+
+### Индексация 
+
+как для матрицы
+
+```{r}
+df[3:4, -1]
+```
+
+
+### Фильтрация по условию
+
+```{r}
+df[df$x > 2, ]
+```
+
+```{r}
+subset(df, x > 2)
+```
+
+```{r}
+subset(df, x > 2, select = c(x, z))
+```
+
+### Комбинирование data frame-ов
+
+Функции `rbind()` и `cbind()` работают как для матриц
+
+```{r}
+rbind(df, data.frame(x = 5:6, y = c("k", "l"), z = TRUE, row.names = c("Kappa", "Zulu")))
+```
+
+
+```{r}
+cbind(df, data.frame(season = c("Summer", "winter", "autumn", "Spring"), temp = c(20, 15, 2, 5)))
+```
+
+### Комбинирование data frame-ов джоинами
+
+```{r}
+attitude %>%
+  mutate(sum = complaints + raises + advance,
+         num = 1:30) %>%
+  arrange(desc(learning)) %>%
+  head(5) %>%
+  arrange(desc(sum)) %>%
+  head(1) %>%
+  select(num)
+```
+
+```{r}
+subset(attitude, learning > 70)
+```
+
+### Импорт данных
+
+```{r}
+attitude[attitude$rating < 50, -"rating"]
+subset(attitude, rating < 50, -rating)
+attitude[rating < 50, names(attitude) != "rating"]
+attitude[attitude$rating < 50, names(attitude) != "rating"]
+subset(sel = -rating, sub = rating < 50, attitude)
+```
+
+
+```{r}
+quakes %>% View()
+summary(quakes)
+?quakes
 ```
 
