@@ -799,3 +799,79 @@ summary(quakes)
 ?quakes
 ```
 
+#### Задача
+Доцент кафедры прикладного анализа данных Арчибальд Нелёгких проделал ту же работу над массивом avianHabitat, что и мы, и отправил результаты учёным из Аляски. Сегодня утром он обнаружил в почтовом ящике письмо следующего содержания.
+
+Дорогой Арчи!
+Получил твои расчёты. Твой вопрос относительно покрытия растительностью действительно обоснован: общее покрытие в самом деле достаточно низкое. Ты ведь не забыл, что мы работаем в Аляске? Смотри сам (фото справа):
+http://minerals.usgs.gov/alaska/economic/sewpen.html
+Ладно, слушай, у меня к тебе ещё одна просьба. У нас тут стажёр из аспирантуры работает, зовут его Карлош Линнейес или как-то так. В общем, он забыл прикрепить свои измерения к общему файлу. Ты не мог бы принять его кусок данных, прикрепить его к общему массиву и пересчитать показатели?
+Только имей в виду: этот аспирант рассеянный тип, наверняка он что-нибудь напортачил. Впрочем, для тебя это наверняка пустяки! Файл avianHabitat2.csv прикрепляю.
+Заранее спасибо!
+Дж.
+
+
+Помогите Арчибальду! Cкачайте файл по ссылке, добавьте новые данные в общий дата фрейм и повторите подсчёт общего покрытия, добавив переменную total_coverage. В качестве ответа пришлите величину среднего покрытия с точностью до второго знака: X.XX 
+
+```{r}
+avianHabitat <- read_csv("https://raw.githubusercontent.com/tonytonov/Rcourse/master/R%20programming/avianHabitat.csv")
+
+avianHabitat2 <- read_delim("https://raw.githubusercontent.com/tonytonov/Rcourse/master/R%20programming/avianHabitat2.csv", delim = ";", skip = 5, comment = " %", na = c("Don't remember", "NA"))
+
+avianHabitat2 <- avianHabitat2 %>% 
+  mutate(Observer = NA)
+
+avian <- rbind(avianHabitat, avianHabitat2)
+
+names(avian)
+coverage_variables <- names(avian)[-(1:4)][c(T, F)]
+avian$total_coverage <- rowSums(avian[, coverage_variables])
+mean(avian$total_coverage)
+```
+
+#### Задача 2
+
+Растительность Аляски, как мы уже знаем, достаточно скудна. Исследователям интересно, какие выдающиеся экземпляры растений удалось обнаружить? На массиве avianHabitat найдите максимальные высоты по каждому виду растений и отсортируйте эти виды по убыванию, от самого высокого к самому низкому.
+
+```{r}
+result <- avianHabitat %>% 
+  summarise(A = max(AHt),
+            DB = max(DBHt),
+            L = max(LHt),
+            E = max(EHt),
+            H = max(HHt),
+            W = max(WHt))
+
+t(result)
+```
+
+## Факторы и строки
+
+```{r}
+v <- ("Аэрофотосъёмка ландшафта уже выявила земли богачей и процветающих крестьян.")
+length(v)
+sum(v)
+nchar(v)
+str_length(v)
+strsplit
+```
+
+### Задача
+
+```{r}
+library(stringr)
+
+hamlet <- "To be, or not to be: that is the question:
+Whether 'tis nobler in the mind to suffer
+The slings and arrows of outrageous fortune,
+Or to take arms against a sea of troubles,
+And by opposing end them?"
+
+hamlet <- str_replace_all(hamlet, "[:punct:]", "")
+hamlet <- tolower(unlist(str_split(hamlet, "[:space:]")))
+
+sum(!is.na(str_match(hamlet, "to"))) # Количество слов "to"
+sum(!is.na(str_match(hamlet, "b")))
+str_length(hamlet)
+```
+
