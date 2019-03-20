@@ -814,6 +814,7 @@ http://minerals.usgs.gov/alaska/economic/sewpen.html
 Помогите Арчибальду! Cкачайте файл по ссылке, добавьте новые данные в общий дата фрейм и повторите подсчёт общего покрытия, добавив переменную total_coverage. В качестве ответа пришлите величину среднего покрытия с точностью до второго знака: X.XX 
 
 ```{r}
+library(tidyverse)
 avianHabitat <- read_csv("https://raw.githubusercontent.com/tonytonov/Rcourse/master/R%20programming/avianHabitat.csv")
 
 avianHabitat2 <- read_delim("https://raw.githubusercontent.com/tonytonov/Rcourse/master/R%20programming/avianHabitat2.csv", delim = ";", skip = 5, comment = " %", na = c("Don't remember", "NA"))
@@ -875,3 +876,54 @@ sum(!is.na(str_match(hamlet, "b")))
 str_length(hamlet)
 ```
 
+## Факторы
+
+Факторы --- для качественных переменных
+
+### Задача
+
+Используйте показанную мной связку из двух функций, чтобы превратить количественную переменную mag (сила землетрясения в баллах по шкале Рихтера) дата фрейма quakes в качественную. Интервалы должны быть длиной в полбалла, начиная с минимального, при этом левый конец интервала включается. Теперь отсортируйте общее количество случаев, попавших в каждую категорию, в порядке убывания.
+
+```{r}
+cut(rnorm(10), -5:5)
+table(cut(rnorm(1000), -5:5))
+
+v <- seq(4, 6.5, 0.5)
+min(quakes$mag)
+
+table(cut(quakes$mag, v, include.lowest = T, right = F))
+
+```
+
+### Часть 2
+
+```{r}
+avian$site_name <- factor(str_replace(avian$Site, "[:digit:]+", ""))
+tapply(avian$DBHt, avian$site_name, mean)
+```
+
+
+### Задача
+
+Теперь, когда у нас есть переменная site_name, мы можем оценить общее покрытие в каждой из исследованных местностей. Используйте комбинацию site_name и total_coverage, чтобы определить тот регион, в котором среднее общее покрытие, скажем, наименьшее.
+
+```{r}
+tapply(avian$total_coverage, avian$site_name, min)
+```
+
+### Задача
+
+Наши любимые учёные, конечно же, соревнуются между собой. Самоё почётное, как нам уже известно, -- найти самый высокий экземпляр вида. В конце сезона исследователи подводят итоги и определяют самого удачливого, который торжественно объявляется чемпионом. После чего все пьют горячий грог и травят байки у костра.
+Хорошо у них там!
+Давайте поможем нашим друзьям определить, кто из них нашёл самые большие экземпляры по каждому виду.
+
+```{r}
+avian %>%
+  group_by(Observer) %>%
+    summarise(A = max(AHt),
+            DB = max(DBHt),
+            L = max(LHt),
+            E = max(EHt),
+            H = max(HHt),
+            W = max(WHt))
+```
