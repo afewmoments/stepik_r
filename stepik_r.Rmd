@@ -951,8 +951,6 @@ norm
 
 ### Задача
 
-Одна интересная конструкция, о которой я рассказал, может быть использована для передачи произвольного количества аргументов далее по стеку вызовов вложенных функций. С помощью этой конструкции напишите такую функцию, которая займётся украшением строк.
-
 Пусть функция decorate_string действует поверх функции paste, дополнительно приклеивая к результату аргумент pattern. При этом этот аргумент должен быть присоединён как в начале строки (строк), так и в конце, но перевёрнутый задом наперёд.
 
 Тут проще всего показать на примерах:
@@ -973,24 +971,27 @@ norm
 
 
 ```{r}
-decorate_string <- function(pattern, ...) { 
-
-}
-```
-
-```{r}
-?paste()
-paste(1:4, 2:5, sep = "-")
-
-paste("123")
-
+# Долго бился над задачей, потому что не было понимания проброса через многоточие
 v <- "123"
-str_()
+u <- "5678"
+paste(v, c("o", "x"), sep = "-")
 
-paste(sort(unlist(strsplit(x = "beetle_bee",split = "_"))), collapse="_")
+paste(".:", 1:2, 3:4, 5:6, sep = "&")
+paste("!", c("x", "x"), collapse = "_")
 
+# Но всё заработало, когда понял и применил
+
+paste(v, paste("abc"), stringi::stri_reverse(v), sep = "")
+paste(v, paste("abc", "def"), stringi::stri_reverse(v), sep = "")
+paste(v, paste(c("abc", "def")), stringi::stri_reverse(v), sep = "")
+paste(v, paste("abc", "def", sep = "+"), stringi::stri_reverse(v), sep = "")
+
+decorate_string <- function(pattern, ...) {
+  paste0(pattern, paste(...), stringi::stri_reverse(pattern))
+}
+
+decorate_string(pattern = "!", c("x", "x"), collapse = "_")
 ```
 
-
-
+### Задача
 
