@@ -48,6 +48,10 @@ mtcars$even_gear <- as.numeric(mtcars$gear %% 2 == 0)
 
 ```{r}
 mpg_4 <- mtcars$mpg[mtcars$cyl == 4]
+
+factorial(43) / (factorial(8) * factorial(43-8))
+factorial(43) / (factorial(6) * factorial(43-6))
+
 ```
 
 
