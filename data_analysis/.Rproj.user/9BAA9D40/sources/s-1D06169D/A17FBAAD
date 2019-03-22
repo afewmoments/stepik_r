@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1553267057144.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A17FBAAD",
+    "lastKnownWriteTime" : 1553268509,
+    "last_content_update" : 1553268509837,
+    "path" : "C:/Users/MasyutaSA/Desktop/github/stepik_r/data_analysis/data_analysis.Rmd",
+    "project_path" : "data_analysis.Rmd",
+    "properties" : {
+        "chunk_output_type" : "console",
+        "cursorPosition" : "49,36",
+        "scrollLine" : "35",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
