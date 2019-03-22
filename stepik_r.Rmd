@@ -1026,26 +1026,42 @@ decorate_string(pattern = "!", c("x", "x"), collapse = "_")
 `5 %+% c(2, 6) # c(7, NA)`
 
 
+Я решил пойти по пути проверки всех длин слагаемых
+
 ```{r}
-1:5 %in% c(1, 2, 5)
-
-length(1:2) + 1:2
-
-y <- 1:2
-
-x[length(x)]
-
-c((x[y] + y), length(x)- length(y))
-
-
-
-length(5) + length(c(2, 6))
-
 "%+%" <- function(x, y) {
-if (length(x) > length(y)) {
-  
-}
+  if (length(x) ==  length(y)) {
+    x + y
+  } else {
+  if (length(x) == 1){
+   c(y[length(x)] + x, y[(length(x) + 1):length(y)] * NA) 
+  } else {
+  if (length(y) == 1){
+   c(x[length(y)] + y, x[(length(y) + 1):length(x)] * NA) 
+  } else {
+  if(length(x)>length(y)){
+   c(x[y] + y, x[(length(y) + 1):length(x)] * NA)
+  } else {
+   c(y[x] + x, y[(length(x) + 1):length(y)] * NA) 
+  }  
+  }
+  }
+  }
 }
 
+5 %+% c(2, 6) # c(7, NA)
+1:5 %+% 1:2   # c(2, 4, NA, NA, NA)
+1:2 %+% 1:5 # 2 4 NA NA NA
+1 %+% 1
+1:2 %+% 1:2
+```
+
+Но оказывается можно сделать всё гораздо проще, через анонимную функцию
+
+```{r}
+"%+%" <- function(x, y) {
+  sapply(1:max(length(x),length(y)),function(i) x[i]+y[i])
+}
+# красота
 ```
 
