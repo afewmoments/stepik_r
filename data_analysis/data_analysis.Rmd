@@ -106,6 +106,124 @@ result <- "My mean is great"
 }
 ```
 
+### Задача
+
+В встроенных в R данных AirPassengers хранится 144 значения (количество пассажиров в месяц) с 1949 по 1960 год. Данные Time-Series очень похожи на вектор по своей структуре, например мы можем обратиться к любому из 144 элементов используя уже знакомую нам индексацию AirPassengers[1] или AirPassengers[56].
+
+Можно вообще перевести исходные данные в вектор при помощи команды as.vector(AirPassengers) и продолжить с ними работу как с вектором.
+
+И так ваша задача создать переменную good_months и сохранить в нее число пассажиров только в тех месяцах, в которых это число больше, чем показатель в предыдущем месяце.  
+
+Важный момент! В R оператор : для создания последовательности имеет приоритет над арифметическими действиями. Таким образом, если у вас есть переменная i, равная 10, и вы хотите создать вектор от 1 до i - 1, воспользуйтесь скобками, чтобы указать последовательность действий.
+
+```{r}
+?AirPassengers # справка о данных
+str(AirPassengers) # структура данных
+```
+
+```{r}
+(fit <- arima(log10(AirPassengers), c(0, 1, 1),
+              seasonal = list(order = c(0, 1, 1), period = 12)))
+update(fit, method = "CSS")
+update(fit, x = window(log10(AirPassengers), start = 1954))
+pred <- predict(fit, n.ahead = 24)
+tl <- pred$pred - 1.96 * pred$se
+tu <- pred$pred + 1.96 * pred$se
+ts.plot(AirPassengers, 10^tl, 10^tu, log = "y", lty = c(1, 2, 2))
+```
+
+Моё решение:
+
+```{r}
+length(AirPassengers) 
+
+AirPassengers[1] < AirPassengers[145]
+
+good_months<-c()
+for (i in 1:(length(AirPassengers)-1)) {
+  if (AirPassengers[i+1]>AirPassengers[i]) {
+    good_months<-append(good_months,AirPassengers[i+1]) 
+  }
+}
+```
+
+Более ровное решение с циклом
+
+```{r}
+good_months <- c()    
+index <- 1    
+for (i in 2:length(AirPassengers)) {    
+	if (AirPassengers[i]>AirPassengers[i-1]){    
+		good_months[index] <- AirPassengers[i]    
+		index <- index + 1    
+		}    
+	}
+```
+
+Очень красивое решение, без цикла
+
+```{r}
+good_months <- AirPassengers[-1][AirPassengers[-1] > AirPassengers[-144]]
+```
+
+Разберём его. 
+Делаем два вектора. 
+Первый `AirPassengers[-1]` --- вектор без первого значения
+Второй `AirPassengers[-144]` --- вектор без последнего значения
+Далее мы сравниваем значение с его последующим значением.
+
+При сравнении, мы получаем логический вектор
+
+```{r}
+AirPassengers[-1] > AirPassengers[-144]
+```
+
+Далее, чтобы получить обратно значения, нужно в исходном векторе без первого значения взять `TRUE` индексы
+
+### Задача
+
+Для встроенных в R данных AirPassengers рассчитайте скользящее среднее с интервалом сглаживания равным 10. Напечатайте получившийся результат (первым значением в выводе должно быть среднее для элементов 1:10, во втором значении - среднее для элементов 2:11 и т.д., в последнем  - среднее для элементов 135 :144)
+
+Все полученные значения средних сохраните в переменную moving_average.
+
+
+Моё решение:
+```{r}
+x <- c(2, 4, 7)
+y <- c(2, 3, 5)
+x - y
+cumsum(x)
+cumsum(1:10)
+as.vector(AirPassengers)
+moving_average <- (cumsum(AirPassengers)[10:144] - c(0, cumsum(AirPassengers[1:134]))) / 10
+
+AirPassengers[-2]
+
+
+cumsum(AirPassengers[-10]) - cumsum(AirPassengers[-144])
+```
+
+В общем виде:
+
+```{r}
+n <- 10    
+d <- AirPassengers    
+cx <- c(0, cumsum(d))    
+moving_average <- (cx[(n + 1):length(cx)] - cx[1:(length(cx) - n)]) / n
+```
+
+Можно через цикл:
+
+```{r}
+moving_average <- numeric(135) # создаем пустой числовой вектор из 135 элементов    
+last_index <- length(AirPassengers) - 9    
+for (i in 1:last_index) {    
+	end <- i + 9    
+	moving_average[i] <- mean(AirPassengers[i:end])    
+}
+```
+
+
 
 ## Описательные статистики
 
