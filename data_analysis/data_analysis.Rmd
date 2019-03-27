@@ -57,6 +57,39 @@ factorial(43) / (factorial(6) * factorial(43-6))
 
 ## Элементы синтаксиса
 
+Введём тестовый набор данных
+
+```{r}
+mydata <- read.csv("evals.csv")
+```
+
+
+```{r}
+mydata$quality <- rep(NA, nrow(mydata))
+```
+
+
+```{r}
+for (i in 1:nrow(mydata)){
+  if (mydata$score[i] > 4){
+    mydata$quality[i] <- "good"
+  } else mydata$quality[i] <- "bad"
+}
+```
+
+### Задача
+
+Создайте новую числовую переменную  new_var в данных mtcars, которая содержит единицы в строчках, если в машине не меньше четырёх карбюраторов (переменная "carb") или больше шести цилиндров (переменная "cyl"). В строчках, в которых условие не выполняется, должны стоять нули.
+
+```{r}
+for (i in 1:nrow(mtcars)) {
+  if (mtcars$carb[i] >= 4 || mtcars$cyl[i] > 6){
+    mtcars$new_var[i] <- 1
+  } else mtcars$new_var[i] <- 0
+}
+```
+
+
 ## Описательные статистики
 
 ## Сохранение результатов
