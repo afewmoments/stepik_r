@@ -200,13 +200,10 @@ x - y
 cumsum(x)
 cumsum(1:10)
 as.vector(AirPassengers)
+
 moving_average <- (cumsum(AirPassengers)[10:144] - c(0, cumsum(AirPassengers[1:134]))) / 10
-
-AirPassengers[-2]
-
-
-cumsum(AirPassengers[-10]) - cumsum(AirPassengers[-144])
 ```
+
 
 В общем виде:
 
