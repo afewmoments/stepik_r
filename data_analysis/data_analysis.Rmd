@@ -13,6 +13,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
+Обновление
+
+```{r}
+# install.packages("installr")
+# library(installr)
+# updateR()
+```
+
 
 # Этап 1
 
@@ -228,6 +236,54 @@ for (i in 1:last_index) {
 
 ## Описательные статистики
 
+`aggregate()` --- позволяет разбивать на группы.
+
+```{r}
+mean_hp_vs <- aggregate(x = mtcars$hp, by = list(mtcars$vs), FUN = mean)
+colnames(mean_hp_vs) <- c("VS", "Mean HP")
+mean_hp_vs
+```
+
+Короткая запись выглядит вот так
+
+```{r}
+aggregate(hp ~ vs, mtcars, mean)
+```
+
+Разбиение по двум переменным
+
+```{r}
+aggregate(hp ~ vs + am, mtcars, mean)
+```
+
+Есть библиотека `psych` в которой есть джентельменский набор большинства описательных статистик
+
+```{r}
+# install.packages("psych")
+library(psych)
+```
+
+Итак опистельные статистики в одном флаконе
+
+```{r}
+descr <- describe(x = mtcars[, -c(8,9)])
+```
+
+Более новая версия `describeBy`
+
+```{r}
+descr2 <- describeBy(x = mtcars[, -c(8,9)], group = mtcars$vs) # В выводе лист
+
+descr2 <- describeBy(x = mtcars[, -c(8,9)], group = mtcars$vs, mat = TRUE, digits = 1) # В выводе матрица, с одни знаком после запятой
+```
+
+Можно сократить вывод до кол-ва базовых статистик
+
+```{r}
+descr3 <- describeBy(x = mtcars[, -c(8,9)], group = mtcars$vs, mat = TRUE, digits = 1, fast = TRUE)
+```
+
+
 
 ### Задача
 
@@ -238,5 +294,22 @@ for (i in 1:last_index) {
 ```{r}
 result <- mean(mtcars$qsec[mtcars$cyl != 3 & mtcars$mpg > 20])
 ```
+
+### Задача
+
+При помощи функции aggregate рассчитайте стандартное отклонение переменной hp (лошадиные силы) и переменной disp (вместимости двигателя)  у машин с автоматической и ручной коробкой передач. 
+
+Полученные результаты (результаты выполнения функции aggregate) сохраните в переменную descriptions_stat.
+
+```{r}
+descriptions_stat <- aggregate(x = mtcars[, c("hp", "disp")], by = list(mtcars$am), FUN = sd)
+```
+
+Вот чуть более изящное применение 
+
+```{r}
+descriptions_stat <- aggregate(. ~ mtcars$am,mtcars[,c(3,4)],sd)
+```
+
 
 ## Сохранение результатов
