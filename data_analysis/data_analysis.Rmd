@@ -339,4 +339,117 @@ describeBy(x = iris)
 describeBy(x = iris, group = iris$Species)
 ```
 
-## Сохранение результатов
+### Задача
+
+Воспользуемся встроенными данными airquality. В новую переменную сохраните subset исходных данных, оставив наблюдения только для месяцев 7, 8 и 9.
+
+При помощи функции aggregate рассчитайте количество непропущенных наблюдений по переменной Ozone в 7, 8 и 9 месяце. Для определения количества наблюдений используйте функцию length(). 
+
+Результат выполнения функции aggregate сохраните в переменную result.
+
+```{r}
+# Это выражение считает и пропущенные значения тоже
+aggregate(x = new_airquality[, "Ozone"], by = list(new_airquality$Month), length)
+
+# Это выражение не считает пропущенные значения
+aggregate(Ozone ~ Month, subset(airquality, Month > 6), length)
+```
+
+### Задача
+
+В переменной my_vector сохранен вектор с пропущенными значениями. Вам нужно создать новый вектор fixed_vector, в котором все пропущенные значения вектора my_vector будут заменены на среднее значение по имеющимся наблюдениям.
+
+При этом исходный вектор оставьте без изменений!
+
+Напоминаю, переменная my_vector уже создана, сразу начинайте работать с ней. Перед тем, как сдавать решение, вы можете потренироваться на различных примерах. Ниже небольшой код, который может создать случайный вектор (выборка из нормального распределения) с пропущенными значениями.
+
+```{r}
+my_vector <- rnorm(30)
+my_vector[sample(1:30, 10)] <- NA
+
+replace(my_vector, is.na(my_vector), mean(my_vector, na.rm = TRUE))
+```
+
+## Описательные статистики. Графики
+
+Базовые графики
+
+```{r}
+hist(mtcars$mpg, breaks = 20, xlab = "MPG")
+boxplot(mtcars, mpg ~ am)
+plot(mtcars$mpg, mtcars$disp)
+```
+
+но лучше строить в пакете `ggplot2`.
+Вот допустим гистограммы
+
+```{r}
+ggplot(mtcars, aes(x = mpg)) +
+  geom_histogram(fill = "white", color = "black", binwidth = 2)
+```
+
+Вот допустим плотность
+
+```{r}
+ggplot(mtcars, aes(x = mpg, fill = factor(am))) +
+  geom_density(alpha = 0.6)
+```
+
+Ещё пару графиков
+
+```{r}
+ggplot(mtcars, aes(x = factor(am), y = hp, color = factor(vs))) +
+  geom_boxplot()
+```
+
+### Задача
+
+При помощи функции ggplot() или boxplot() постройте график boxplot, используя встроенные в R данные airquality. По оси x отложите номер месяца, по оси y — значения переменной Ozone.
+
+На графике boxplot отдельными точками отображаются наблюдения, отклоняющиеся от 1 или 3 квартиля больше чем на полтора межквартильных размаха. Сколько таких наблюдений присутствует в сентябре (месяц №9)?
+
+```{r}
+ggplot(airquality, aes(factor(Month), Ozone)) +
+  geom_boxplot()
+```
+
+
+### Задача
+
+Используем знакомые нам данные mtcars. 
+
+Нужно построить scatterplot с помощью ggplot из ggplot2, по оси x которого будет mpg, по оси y - disp, а цветом отобразить переменную (hp).
+
+Полученный график нужно сохранить в переменную plot1. Таким образом в ответе должен быть скрипт:
+
+```{r}
+plot1 <- ggplot(mtcars, aes(mpg, disp, color = hp)) +
+  geom_point()
+```
+
+### Задача
+
+Немного гистограмм с ирисами
+
+```{r}
+ggplot(iris, aes(Sepal.Length, fill = Species)) + geom_histogram()
+ggplot(iris, aes(Sepal.Length)) + geom_histogram(aes(fill = Species))
+```
+
+### Задача
+
+Студент Ярослав очень любит строить графики в R. Основываясь на данных iris он хочет построить следующий график:
+
+Scatterplot (диаграмма рассеивания), где по оси X будет отложена переменная Sepal.Length,  по оси Y переменная  Sepal.Width. За цвет точек будет отвечать переменная  Species, а за размер точек переменная Petal.Length.
+
+
+```{r}
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species, size = Petal.Length)) +
+  geom_point()
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_point(aes(color = Species, size = Petal.Length))
+```
+
+
+
