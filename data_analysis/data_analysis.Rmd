@@ -499,9 +499,23 @@ prop.table(HairEyeColor[ , ,'Male'], 2)['Red', 'Blue']
 
 ### Задача
 
-Напишите число зеленоглазых женщин в наборе данных HairEyeColor.
+Какой запрос будет возвращать 1,2 и 5 столбец данных
 
 ```{r}
+df <- tibble(
+  first_name = 1,
+  last_name = 2,
+  email_address = 3,
+  postal_address = 4,
+  date_added = 5
+)
 
+df
+
+select(df, -(3:4))
+df %>% select(c(1:2, 5))
+select(df, matches("_.{4,5}$"))
+select(df, contains("name"), date_added)
+select(df, first_name, last_name, date_added)
 ```
 
