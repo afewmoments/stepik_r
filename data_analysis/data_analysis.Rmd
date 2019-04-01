@@ -451,5 +451,57 @@ ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
   geom_point(aes(color = Species, size = Petal.Length))
 ```
 
+## Анализ номинативных данных
 
+Данные для работы на этом уроке
+
+```{r}
+df <- read_csv("grants.csv")
+
+# сделаем замены на фактор и понятные описания
+df$status <- as.factor(df$status)
+levels(df$status) <- c("Not funded", "Funded")
+
+df$status <- factor(df$status, labels = c("Not funded", "Funded"))
+
+str(df)
+
+# 1d table
+t1 <-  table(df$status)
+
+# 2d table
+t2 <- table(df$status, df$field)
+
+prop.table(t2)
+
+# 3d table
+
+t3 <- table(Years = df$years_in_uni, Field = df$field, Status = df$status)
+
+dim(t3)
+```
+
+### Задача
+
+Ваша задача в переменную red_men сохранить долю рыжеволосых (Red) от общего числа голубоглазых мужчин.
+
+```{r}
+HairEyeColor
+dimnames(HairEyeColor)
+
+# only man
+prop.table(HairEyeColor[ , ,'Male'], 2)['Red', 'Blue']
+```
+
+* создаем двумерную таблицу, 2- группировка значений по столбцу `prop.table(HairEyeColor[ , ,'Male'], 2)`
+
+* обращаемся к ее х/у `['Red', 'Blue']`
+
+### Задача
+
+Напишите число зеленоглазых женщин в наборе данных HairEyeColor.
+
+```{r}
+
+```
 
