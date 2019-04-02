@@ -499,6 +499,18 @@ prop.table(HairEyeColor[ , ,'Male'], 2)['Red', 'Blue']
 
 ### Задача
 
+Напишите число зеленоглазых женщин в наборе данных HairEyeColor.
+
+```{r}
+as.data.frame(HairEyeColor) %>%
+  group_by(Sex, Eye) %>%
+  summarise(sum = sum(Freq)) %>%
+  filter(Sex == "Female", Eye == "Green")
+```
+
+
+### Задача
+
 Какой запрос будет возвращать 1,2 и 5 столбец данных
 
 ```{r}
