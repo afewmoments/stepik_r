@@ -481,6 +481,17 @@ t3 <- table(Years = df$years_in_uni, Field = df$field, Status = df$status)
 dim(t3)
 ```
 
+Тесты
+
+```{r}
+chisq.test(t2)
+
+fisher.test(t2)
+```
+
+
+
+
 ### Задача
 
 Ваша задача в переменную red_men сохранить долю рыжеволосых (Red) от общего числа голубоглазых мужчин.
@@ -525,9 +536,30 @@ df <- tibble(
 df
 
 select(df, -(3:4))
+
 df %>% select(c(1:2, 5))
 select(df, matches("_.{4,5}$"))
 select(df, contains("name"), date_added)
 select(df, first_name, last_name, date_added)
+```
+
+
+### Задача
+
+Постройте столбчатую диаграмму распределения цвета глаз по цвету волос только у женщин из 
+таблицы HairEyeColor. По оси X должен идти цвет волос, цвет столбиков должен отражать цвет глаз. По оси Y - количество наблюдений.
+
+```{r}
+mydata <- as.data.frame(HairEyeColor)
+
+ggplot(data = subset(mydata, Sex == 'Female'), aes(x = Hair , y = Freq, fill = Eye)) + 
+  geom_bar(stat="identity", position = "dodge")
+```
+### Задача
+
+На основе таблицы HairEyeColor создайте ещё одну таблицу, в которой хранится информация о распределении цвета глаз у женщин-шатенок (Hair = 'Brown'). Проведите тест равномерности распределения цвета глаз у шатенок и выведите значение хи-квадрата для этого теста.
+
+```{r}
+chisq.test(HairEyeColor["Brown", ,"Female"])
 ```
 
