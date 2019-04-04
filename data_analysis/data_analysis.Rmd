@@ -598,3 +598,81 @@ diamonds %>%
   summarise(mean = mean(price))
 ```
 
+### Задача
+
+При помощи точного критерия Фишера проверьте гипотезу о взаимосвязи типа коробки передач (am) и типа двигателя (vs) в данных mtcars. Результат выполнения критерия сохраните в переменную.Получившийся p - уровень значимости сохраните в переменную fisher_test.
+
+
+```{r}
+fisher_test <- fisher.test(mtcars$am, mtcars$vs)[1]
+```
+
+## Сравнение двух групп
+
+Будем сравнивать две группы в ирисах
+
+```{r}
+# Отберём две группы из встроенного набора данных
+df <- iris
+df1 <- subset(df, Species != "setosa")
+table(df1$Species)
+
+
+# Посмотрим как распределяются две группы
+ggplot(df1, aes(x = Sepal.Length)) +
+  geom_histogram(fill = "white", col = "black", binwidth = 0.4) +
+  facet_grid(Species ~ .)
+
+ggplot(df1, aes(Sepal.Length, fill = Species)) +
+  geom_density(alpha = 0.5)
+
+# Посмотрим, есть ли выбросы в данных 
+ggplot(df1, aes(Species, Sepal.Length)) +
+  geom_boxplot()
+```
+
+Теперь посмотрим на сколько значимы различия. Для этого сначала надо убедиться в нормальности распределения параметров.
+
+```{r}
+shapiro.test(df1$Sepal.Length)
+```
+
+p-value уровень значимость превышает 0.05 --- можем сделать вывод что по всей выборке распредление переменной не отличается от нормального.
+
+```{r}
+# Базовый синтаксис
+shapiro.test(df1$Sepal.Length[df1$Species == "versicolor"])
+shapiro.test(df1$Sepal.Length[df1$Species == "virginica"])
+```
+
+2. Разберём второе ограничение --- гомогенность дисперсий
+
+```{r}
+bartlett.test(Sepal.Length ~ Species, df1)
+```
+
+p-value уровень значимость превышает 0.05 --- гомогенность дисперсий подтверждена
+
+Теперь выполним t-test 
+
+```{r}
+t.test(Sepal.Length ~ Species, df1)
+```
+
+p-value уровень значимость сильно меньше 0.05 --- отвергаем нулевую гипотезу о равенстве средних
+
+```{r}
+test1 <- t.test(Sepal.Length ~ Species, df1)
+str(test1)
+# Чтобы обратится к конкретно p-value
+test1$p.value
+```
+
+Нулевая гипотеза --- длина и ширина лепестка равны между собой
+
+```{r}
+t.test(df1$Petal.Length, df1$Petal.Width, paired = TRUE)
+```
+
+![](img/cheetsheet.png)
+
