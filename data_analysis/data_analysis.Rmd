@@ -676,3 +676,18 @@ t.test(df1$Petal.Length, df1$Petal.Width, paired = TRUE)
 
 ![](img/cheetsheet.png)
 
+### Задача
+
+Воспользуемся еще одним встроенным набором данных в R  - ToothGrowth. Данные позволяют исследовать рост зубов у морских свинок в зависимости от дозировки витамина C и типа потребляемых продуктов.
+
+Сравните среднее значение длины зубов свинок, которые потребляли апельсиновый сок (OJ) с дозировкой 0.5 миллиграмм, со средним значением длины зубов свинок, которые потребляли аскорбиновую кислоту (VC) с дозировкой 2 миллиграмма. 
+
+```{r}
+# уфф решение в лоб
+t_stat <- t.test(ToothGrowth$len[ToothGrowth$supp == "OJ"][ToothGrowth$dose == 0.5][!is.na(ToothGrowth$len[ToothGrowth$supp == "OJ"][ToothGrowth$dose == 0.5])], ToothGrowth$len[ToothGrowth$supp == "VC"][ToothGrowth$dose == 2.0][!is.na(ToothGrowth$len[ToothGrowth$supp == "VC"][ToothGrowth$dose == 2.0])])$statistic
+
+# а вот как по уму надобно сделать. Повторяй индексацию
+correct_data <- subset(ToothGrowth, supp=='OJ' & dose==0.5 | supp=='VC' & dose==2)    
+t_stat <- t.test(len ~ supp, correct_data)$statistic
+```
+
