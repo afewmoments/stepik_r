@@ -11,12 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(Hmisc)
 ```
 
 Обновление
 
 ```{r}
-# install.packages("installr")
+# install.packages("Hmisc")
 # library(installr)
 # updateR()
 ```
@@ -675,6 +676,36 @@ t.test(df1$Petal.Length, df1$Petal.Width, paired = TRUE)
 ```
 
 ![](img/cheetsheet.png)
+Мы хотим построить на графике саму переменную с указанием доверительных интервалов и среднего.
+
+```{r}
+ggplot(df1, aes(Species, Sepal.Length)) + 
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1) +
+  stat_summary(fun.y = mean, geom = "point", size = 4)
+  
+```
+
+
+непараметрический аналог т.теста. 
+
+```{r}
+wilcox.test(Petal.Length ~ Species, df1)
+```
+
+и график по нему
+
+```{r}
+ggplot(df1, aes(Species, Petal.Length)) + 
+  geom_boxplot()
+```
+
+Выполним wilcox.test для двух зависимых переменных
+
+```{r}
+wilcox.test(df1$Petal.Length, df1$Petal.Width, paired = T)
+```
+
+Отклоняем
 
 ### Задача
 
@@ -708,4 +739,19 @@ str(drugs)
 t.test(drugs$Pressure_before, drugs$Pressure_after, paired = TRUE)[1]
 
 ```
+### Задача
+
+
+Сначала с помощью теста Бартлетта проверьте гомогенность дисперсий двух выборок. В случае, если дисперсии значимо не отличаются (с уровнем 0.05), примените тест Стьюдента, иначе - непараметрический тест (Манна-Уитни). В поле для ответа введите получившийся p-value, с точностью четыре знака после запятой.
+Обратите внимание, что по умолчанию в t.test стоит var.equal = FALSE, так как мы будем применять его только в случае гомогенности дисперсий, измените значение этого параметра на  var.equal = TRUE.
+
+```{r}
+t <- read.table("dataset_11504_15.txt")
+
+bartlett.test(V1 ~ V2, t)
+
+t.test()
+```
+
+
 
