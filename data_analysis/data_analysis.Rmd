@@ -691,3 +691,21 @@ correct_data <- subset(ToothGrowth, supp=='OJ' & dose==0.5 | supp=='VC' & dose==
 t_stat <- t.test(len ~ supp, correct_data)$statistic
 ```
 
+
+### Задача
+
+По всем испытуемым сравните показатель давления до начала лечения (Pressure_before) с показателем давления после лечения (Pressure_after) при помощи t - критерия для зависимых выборок. 
+
+В поле для ответа укажите значение t - критерия.
+
+(В качестве десятичного разделителя используйте запятую, например: 123,54)
+
+```{r}
+drugs <- read.csv("lekarstva.csv")
+
+str(drugs)
+
+t.test(drugs$Pressure_before, drugs$Pressure_after, paired = TRUE)[1]
+
+```
+
