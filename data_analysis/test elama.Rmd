@@ -1,0 +1,36 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Для подключения нужно 
+
+1. Обновить R
+
+1. Скачать пакеты
+
+
+1. Добавить айпишник в облаке
+
+
+```{r}
+install.packages("keyring")
+install.packages("devtools")
+devtools::install_github("r-dbi/odbc")
+library(keyring)
+library(odbc)
+```
+
+Последний рабочий вариант подключения в аре
+
+```{r}
+library(DBI)
+con <- dbConnect(odbc::odbc(), 
+                 Driver = "SQL Server",
+                 Server = "tcp:elamatest.database.windows.net",
+                 Port = "1433",
+                 UID = "elama@elamatest",
+                 PWD = "admin12!",
+                 Database = "elamatest",
+                 timeout = 30)
+```
