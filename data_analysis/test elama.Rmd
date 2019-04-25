@@ -19,6 +19,10 @@ install.packages("devtools")
 devtools::install_github("r-dbi/odbc")
 library(keyring)
 library(odbc)
+install.packages("odbc")
+
+install.packages("DBI")
+install.packages("odbc")
 ```
 
 Последний рабочий вариант подключения в аре
@@ -34,3 +38,17 @@ con <- dbConnect(odbc::odbc(),
                  Database = "elamatest",
                  timeout = 30)
 ```
+
+```{r}
+library(tidyverse)
+
+transactions <- read.csv("transactions.csv")
+users <- read.csv("users.csv")
+webinar <- read.csv("webinar.csv")
+
+transactions$user_id <- as.factor(transactions$user_id)
+str(users)
+users$date_registration <- as.Date.POSIXlt(users$date_registration)
+parse_date(users$date_registration, "%Y-%m-%d %H:%M:%S")
+```
+
