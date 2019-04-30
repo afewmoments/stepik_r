@@ -1038,3 +1038,38 @@ Error: patient:pill
 p value == 0.826
 
 
+### Задача
+
+Теперь вашей задачей будет провести двухфакторный дисперсионный анализ с повторными измерениями: влияние факторов doctor, влияние фактора pill и их взаимодействие на temperature. Учтите обе внутригрупповые переменные: и тот факт, что один и тот же больной принимает разные таблетки, и тот факт, что  один и тот же больной лечится у разных врачей! Каково F-значение для взаимодействия факторов доктора (doctor) и типа таблеток (pill)?
+
+
+
+```{r}
+pill_fit2 <- aov(temperature ~ pill*doctor + Error(patient/(doctor*patient )), data = pills)
+summary(pill_fit2)
+```
+
+
+### Задача
+
+Вспомните графики из лекций и дополните шаблон графика в поле для ответа так (не добавляя еще один geom) , чтобы объединить линиями точки, принадлежащие разным уровням фактора supp. Не забудьте подключить нужный для построение графика пакет.
+Пожалуйста, сохраните график в переменную obj.
+
+
+```{r}
+ggplot(ToothGrowth, aes(x = as.factor(dose), y = len, col = supp, group = supp)) +
+stat_summary(fun.data = mean_cl_boot, geom = 'errorbar', width = 0.1, position = position_dodge(0.2)) +
+stat_summary(fun.data = mean_cl_boot, geom = 'line', size = 1.5, position = position_dodge(0.1)) +
+stat_summary(fun.data = mean_cl_boot, geom = 'point', size = 3, position = position_dodge(0.2))
+```
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(mydata, aes(x = store, y = price, color = origin, grssoup = origin)) + 
+  stat_summary(fun.data = mean_cl_boot, geom = 'errorbar', width = 0.2, lwd = 0.8, position = pd)+  
+  stat_summary(fun.data = mean_cl_boot, geom = 'line', size = 1.5, position = pd) +
+  stat_summary(fun.data = mean_cl_boot, geom = 'point', size = 5, position = pd, pch=15) +
+  theme_bw()
+```
+
+
