@@ -1073,3 +1073,182 @@ ggplot(mydata, aes(x = store, y = price, color = origin, grssoup = origin)) +
 ```
 
 
+## Написание собственных функций 
+
+```{r}
+# Сгенерируем выборку из ста значений, где первые 30 это пропущенные значения
+distr1 <- rnorm(100)
+distr1[1:30] <- NA
+
+# Заменим пропущенные значения на среднее
+distr1[is.na(distr1)] <- mean(distr1, na.rm = T)
+
+#  Создадим функцию, которая выполняет замену пропущенных значений
+my_na_rm <- function(x) {
+  x[is.na(x)] <- mean(x, na.rm = T)
+  return(x)
+}
+
+my_na_rm(distr1)
+distr1
+
+# Давайте доработаем фукнцию для вывода предупреждения если на входе текстовые значения
+
+my_na_rm <- function(x) {
+  if(is.numeric(x)){
+   x[is.na(x)] <- mean(x, na.rm = T)
+  return(x) 
+  } else {
+  print("X is not numeric")  
+  }
+}
+
+my_na_rm(c("2", 3, NA))
+
+# Проведём проверку на нормальность. Если распределение нормально, то заменим пропущенные значения на среднее, если не нормально  то заменим их на медиану.
+my_na_rm <- function(x) {
+  if(is.numeric(x)){
+    stat.test <- shapiro.test(x)
+    if(stat.test$p.value > 0.05){
+     x[is.na(x)] <- mean(x, na.rm = T) 
+    } else {
+     x[is.na(x)] <- median(x, na.rm = T)  
+    }
+  return(x)  
+  } else {
+   print("X is not numeric")  
+  }
+}
+
+# Теперь добавим в функцию информативности. В вывод добавим информацию о том, было ли распределение нормально или нет
+my_na_rm <- function(x) {
+  if(is.numeric(x)){
+    stat.test <- shapiro.test(x)
+    if(stat.test$p.value > 0.05){
+     x[is.na(x)] <- mean(x, na.rm = T) 
+     print("NA values were replaced with mean")  
+    } else {
+     x[is.na(x)] <- median(x, na.rm = T)
+     print("NA values were replaced with median") 
+    }
+  return(x)  
+  } else {
+   print("X is not numeric")  
+  }
+}
+```
+
+Теперь проверим как работает наша функция
+
+```{r}
+d1 <- rnorm(2000)
+d2 <- runif(2000)
+
+d1[1:10] <- NA
+d2[1:10] <- NA
+
+d1 <- my_na_rm(d1)
+head(d1)
+
+d2 <- my_na_rm(d2)
+head(d2)
+```
+
+### Задача 
+
+Напишите функцию, которая выводит номера позиций пропущенных наблюдений в векторе.
+
+На вход функция получает числовой вектор с пропущенными значениями. Функция возвращает новый вектор с номерами позиций пропущенных значений.
+
+Подсказка: чтобы проверить является ли наблюдение NA, воспользуйтесь функцией is.na(), кстати, функция векторизирована, и аргументом может служить вектор произвольной длинны. Запись x == NA ни к чему осмысленному не приведет. Т.к. если x это NA, то команда x == NA также вернет NA, а не TRUE!
+
+```{r}
+
+my_vector <- c(24, 15, 32, NA, NA)
+my_vector[is.na(my_vector)]
+which(is.na(my_vector))
+
+
+NA.position <- function(x){    
+which(is.na(x))}
+
+NA.position(my_vector)
+```
+
+### Задача 
+
+Напишите функцию NA.counter для подсчета пропущенных значений в векторе.
+
+На вход функция  NA.counter должна принимать один аргумент - числовой вектор. Функция должна возвращать количество пропущенных значений.
+
+
+```{r}
+my_vector <- c(24, 15, 32, NA, NA)
+
+
+NA.counter <- function(x){
+sum(is.na(x))
+}
+
+NA.counter(my_vector)
+```
+
+### Функция делает из нескольких файлов один дата фрейм
+
+`dir()` --- функция выводит все элементы, которые лежат в рабочей папке по умолчанию
+
+Я немного усложнил себе задачу --- у меня файлы лежат в отдельной папке. 
+Чтобы всё считывалось как надо, нужно прописать правильный путь до файла.
+
+```{r}
+dir(path = "test", pattern = "*.csv") # Эта команда выводит только csv файлы в нужной папке
+
+grants <- data.frame() 
+for (i in dir(path = "test", pattern = "*.csv")) {
+  temp_df <- read.csv(paste("test/", i, sep = ""))
+  grants <- rbind(temp_df, grants)
+}
+```
+
+Теперь создадим функцию, которая бы считывала файлы за нас.
+Эта функция берёт файлы из папки "test", поправь путь для себя.
+
+```{r}
+read_data <- function(){
+  df <- data.frame()
+  number <- 0
+  for (i in dir(path = "test", pattern = "*.csv")) {
+  temp_df <- read.csv(paste("test/", i, sep = ""))
+  df <- rbind(temp_df, df)
+  number <- number + 1
+  }
+  print(paste(as.character(number), "files were combined"))
+  return(df)
+}
+
+grants3 <- read_data()
+```
+
+Если нужно сохранить из тела функции какую-то переменную нужно запись делать по средствам такого оператора `number <<- number + 1`
+
+
+### Задача
+
+Напишите функцию filtered.sum, которая на вход получает вектор с пропущенными, положительными и отрицательными значениями и возвращает сумму положительных элементов вектора.
+
+```{r}
+x <- c(1, -2, 3, NA, NA)
+sum(x[!is.na(x) & x >= 0])
+
+filtered.sum <- function(x){
+  sum(x[!is.na(x) & x >= 0])
+}
+
+# Можно чуть более изящно, при помощи встроенных возможностей
+
+filtered.sum <- function(x){    
+return(sum(x[x > 0], na.rm = T))}
+```
+
+### Задача
+
