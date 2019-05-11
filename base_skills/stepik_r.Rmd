@@ -9,6 +9,7 @@ editor_options:
 ```{r}
 library(tidyverse)
 library(randtoolbox)
+library(psych)
 ```
 
 ## 1.3 Векторы (часть 1)
@@ -1312,4 +1313,104 @@ simulate_norm <- function(n, r = 6, x = 0, y = 0, m = 100, p = 0.01) {
 }
 simulate_norm(100000)
 ```
+
+## Корреляция и простая линейная регрессия
+
+Изучим как работать с функциями
+
+```{r}
+df  <- mtcars
+
+cor.test(x = df$mpg, y = df$hp) # отклоняем нулевую гипотезу
+fit  <- cor.test(x = df$mpg, y = df$hp)
+cor.test(~ mpg + hp, df) # тоже самое при помощи формулы
+str(fit)
+fit$p.value
+```
+
+ВИзуализируем полученные результаты
+
+```{r}
+plot(x = df$mpg, y = df$hp)
+
+ggplot(df, aes(x = mpg, y = hp, col = factor(cyl)))+
+  geom_point(size = 5)+
+  facet_grid(. ~ am)
+```
+
+Попарные сравнения с поправкой на множественные сравнения
+
+```{r}
+df_numeric  <- df[, c(1,3:7)]
+pairs(df_numeric)
+
+cor(df_numeric)
+
+fit  <- corr.test(df_numeric) # эта функция выдаст все значние коэффициентов корреляции в таблицах
+fit$r
+fit$p
+fit$adjust
+```
+
+### Задача
+
+Напишите функцию `corr.calc`, которая на вход получает `data.frame` с двумя количественными переменными, рассчитывает коэффициент корреляции Пирсона и возвращает вектор из двух значений: коэффициент корреляции и p - уровень значимости.
+
+```{r}
+corr.calc <- function(x){
+  check <- cor.test(x[[1]], x[[2]], method = "pearson")
+  return(c(check$estimate[[1]] , check$p.value))
+}
+
+corr.calc(mtcars[, c(1,5)])  # на вход подаем данные mtcars только с переменными mpg и drat
+```
+
+### Задача
+
+Напишите функцию filtered.cor которая на вход получает data.frame с  произвольным количеством переменных (как количественными, так и любых других типов), рассчитывает коэффициенты корреляции Пирсона между всеми парами количественных переменных и возвращает наибольшее по модулю значение коэффициента корреляции. (То есть функция может вернуть -0.9, если это наибольшая по модулю  корреляция).
+
+
+```{r}
+filtered.cor <- function(x){
+  numeric_df <- x[, sapply(x, is.numeric)]
+  fit <- psych::corr.test(numeric_df)
+  negativ_max <- sort(as.vector(fit$r))[[1]]
+  positiv_max <- sort(as.vector(fit$r))[[length(fit$r)-ncol(fit$r)]]
+  if(abs(negativ_max) > positiv_max){
+    return(negativ_max)
+  } else {
+    return(positiv_max)
+  }
+}
+
+filtered.cor(step6)
+filtered.cor(iris)
+```
+
+### Задача
+
+Напишите функцию smart_cor, которая получает на вход dataframe с двумя количественными переменными. Проверьте с помощью теста Шапиро-Уилка, что данные в обеих переменных принадлежат нормальному распределению.
+
+Если хотя бы в одном векторе распределение переменной отличается от нормального (p - value меньше 0.05), то функция должна возвращать коэффициент корреляции Спирмена. (Числовой вектор из одного элемента).
+
+Если в обоих векторах распределение переменных от нормального значимо не отличается, то функция должна возвращать коэффициент корреляции Пирсона.
+
+```{r}
+test_data  <- read.csv("https://stepik.org/media/attachments/course/129/test_data.csv")
+
+smart_cor <- function(df){
+  sh_test_1 <- shapiro.test(df[[1]])
+  sh_test_2 <- shapiro.test(df[[2]])
+  if((sh_test_1$p.value < 0.05) | (sh_test_2$p.value < 0.05)){
+    pearson_test <- cor.test(~ df[[1]] + df[[2]], method = "spearman")
+    return(pearson_test$estimate[[1]])
+  } else{
+    spearman_test <- cor.test(~ df[[1]] + df[[2]], method = "pearson")
+    return(spearman_test$estimate[[1]])
+  }
+}
+
+smart_cor(test_data)
+```
+
 
