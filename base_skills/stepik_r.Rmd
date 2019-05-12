@@ -1532,3 +1532,22 @@ regr.calc <- function(df){
 }
 ```
 
+### Задача
+
+Постройте scatterplot по данным iris, сохранив его в переменную my_plot : 
+Ось X - переменная Sepal.Width
+Ось Y -  переменная Petal.Width
+Цвет точек - переменная Species
+Также добавьте линейное сглаживание для каждой группы наблюдений по переменной Species.
+
+
+```{r}
+ggplot(iris, aes(Sepal.Width, Petal.Width, color = Species)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+
+
+
