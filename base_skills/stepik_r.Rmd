@@ -1402,11 +1402,11 @@ smart_cor <- function(df){
   sh_test_1 <- shapiro.test(df[[1]])
   sh_test_2 <- shapiro.test(df[[2]])
   if((sh_test_1$p.value < 0.05) | (sh_test_2$p.value < 0.05)){
-    pearson_test <- cor.test(~ df[[1]] + df[[2]], method = "spearman")
-    return(pearson_test$estimate[[1]])
-  } else{
-    spearman_test <- cor.test(~ df[[1]] + df[[2]], method = "pearson")
+    spearman_test <- cor.test(~ df[[1]] + df[[2]], method = "spearman")
     return(spearman_test$estimate[[1]])
+  } else{
+    pearson_test <- cor.test(~ df[[1]] + df[[2]], method = "pearson")
+    return(pearson_test$estimate[[1]])
   }
 }
 
@@ -1512,3 +1512,23 @@ fit_coef <- fit$coefficients
 ```
 
 ### Задача
+
+Напишите функцию regr.calc, которая на вход получает dataframe c двумя переменными.
+
+Если две переменные значимо коррелируют (p - уровень значимости для коэффициента корреляции Пирсона меньше 0.05), то функция строит регрессионную модель, где первая переменная - зависимая, вторая - независимая. Затем создает в dataframe новую переменную с назанием fit, где сохраняет предсказанные моделью значения зависимой переменной. В результате функция должна возвращать исходный dataframe с добавленной новой переменной fit.
+
+Если две переменные значимо не коррелируют, то функция возвращает строчку "There is no sense in prediction"
+
+```{r}
+regr.calc <- function(df){
+  check <- cor.test(~ df[[1]] + df[[2]], method = "pearson")
+  if(check$p.value < 0.05){
+    fit <- lm(df[[1]] ~ df[[2]], df)
+    df$fit <- predict(fit, df)
+    return(df)
+  } else {
+    return("There is no sense in prediction")
+  }
+}
+```
+
