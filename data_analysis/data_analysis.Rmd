@@ -1389,3 +1389,117 @@ summary(f1)$adj.r.squared
 summary(lm(rating ~ complaints * critical, attitude))$coefficients["complaints:critical", "t value"]
 ```
 
+## Множественная регрессия (часть 2)
+
+```{r}
+swiss$religious <- ifelse(swiss$Catholic > 60, 'Lots', 'Few')
+swiss$religious <- as.factor(swiss$religious)
+```
+
+```{r}
+fit3 <- lm(Fertility ~ Examination + religious, data = swiss)
+summary(fit3)
+```
+
+Что такое. (Intercept) --- среднее предсказанное значение зависимой переменной для первого уровня категориальной переменной при том что все непрерывные переменные равны нулю.
+
+
+```{r}
+fit4 <- lm(Fertility ~ religious*Examination, data = swiss)
+summary(fit4)
+```
+
+(Intercept) --- здесь значения для religious Few, т.е. среднее предсказанное значение для тех провинций в которых мало католиков, и при этом уровень физической подготовке на нуле.
+
+Коэффициент для физической подготовки `Examination` --- говорит на сколько изменяется в среднем рождаемость при увеличении физической подготовки на единицу в тех провинциях где мало католиков. Говорит об изменениях в переменной хранящейся в (Intercept) 
+
+`religiousLots` --- говорит о том, на сколько изменяется предсказанное значение рождаемости при переходе от провинции где мало католиков к провинциям где много католиков. Т.е. там где много католиков, там малая рождаемость --- но этот коэффициент не значимый 0.691366.
+
+
+
+В следующем степе мы рассмотрим графики, иллюстрирующие зависимости, которые позволяет исследовать множественная регрессия на примере влияния переменных Examination, religious и их взаимодействия на рождаемость (Fertility).
+
+Для начала построим простую диаграмму рассеивания.  
+
+```{r}
+ggplot(swiss, aes(x = Examination, y = Fertility)) + 
+  geom_point()
+```
+
+Затем добавим линию тренда. 
+
+```{r}
+ggplot(swiss, aes(x = Examination, y = Fertility)) + 
+  geom_point() + 
+  geom_smooth(method = 'lm')
+```
+
+Неплохая линейная зависимость с хорошим доверительным интервалом. Что будет, если добавим религиозность
+
+```{r}
+ggplot(swiss, aes(x = Examination, y = Fertility, col = religious)) + 
+  geom_point()
+```
+
+Точки разбились на две области. Добавим линии тренда
+
+```{r}
+ggplot(swiss, aes(x = Examination, y = Fertility, col = religious)) + 
+  geom_point()  + 
+  geom_smooth()
+
+ggplot(swiss, aes(x = Examination, y = Fertility, col = religious)) + 
+  geom_point()  + 
+  geom_smooth(method = 'lm')
+```
+
+Тренды разные.
+
+Разберём пример когда несколько предикторов непрерывные, а одна --- категориальная.
+
+```{r}
+fit5 <- lm(Fertility ~ religious*Infant.Mortality*Examination, data = swiss)
+summary(fit5)
+```
+
+`(Intercept)` --- хранятся среднее предсказанное значение рождаемости для областей где мало католиков, `religious$Few`.
+
+`religiousLots` --- на сколько изменяется предсказанное значение при переходе от Few к Lost
+
+`Infant.Mortality` --- на сколько влияет детская смертность на рождаемость. Относится только к `Few`
+
+`Examination` --- так же как выше. относится только к `(Intercept)` 
+
+`religiousLots:Infant.Mortality` и `religiousLots:Examination` --- относятся к группе наблюдений которые хранятся  в `religiousLots`
+
+`Infant.Mortality:Examination` --- компонент взаимодействия между непрерывными факторами. Как они взаимодействуют при предсказании рождаемости
+
+`religiousLots:Infant.Mortality:Examination` --- как взаимодействуют в предсказаннии Infant.Mortality и Examination в провинциях где много католиков
+
+
+### Задача
+
+В этом примере будем работать с хорошо вам известным встроенным датасетом mtcars. Переменная am говорит о том, какая коробка передач используется в машине: 0 - автоматическая, 1 - ручная. 
+
+Сделаем эту переменную факторной. 
+
+```{r}
+mtcars$am <- factor(mtcars$am, labels = c('Automatic', 'Manual'))
+```
+
+
+Теперь постройте линейную модель, в которой в качестве зависимой переменной выступает расход топлива (mpg), а в качестве независимых - вес машины (wt) и коробка передач (модифицированная am), а также их взаимодействие. Выведите summary этой модели.
+
+Что отражает значение intercept в данной модели?
+
+```{r}
+fit <- lm(mpg ~ wt*am, data = mtcars)
+summary(fit)
+mtcars$wt_centered <- mtcars$wt - mean(mtcars$wt)
+
+ggplot(mtcars, aes(x = wt, y = mpg, col = am)) + 
+  geom_point()  + 
+  geom_smooth(method = 'lm')
+```
+
+`intercept` это --- Расход топлива у машин с автоматической коробкой передач и нулевым весом. Можно понять по последней строчке коэффициентов
