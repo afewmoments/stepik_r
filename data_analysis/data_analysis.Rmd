@@ -14,7 +14,7 @@ library(tidyverse)
 library(Hmisc)
 library(MASS)
 library(PerformanceAnalytics)
-
+library(gvlma)
 ```
 
 Обновление
@@ -1711,4 +1711,230 @@ normality.test(mtcars[,1:6])
 normality.test  <- function(x){    
 	return(sapply(x, FUN =  shapiro.test)['p.value',])}
 ```
+
+## Диагностика модели. Продолжение.
+
+Построим плавную нелинейную модель
+
+```{r}
+ggplot(swiss, aes(x = Examination, y = Education)) + 
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+lm1 <- lm(Education ~ Examination, swiss)
+summary(lm1)
+```
+
+Examination --- значимый предиктор.
+R-squared:  0.4878
+
+Связь похожа на квадратическую.
+
+Построим более сложную полиноминальную модель 
+
+```{r}
+swiss$Examination_squared <- (swiss$Examination)^2
+
+lm2 <- lm(Education ~ Examination + Examination_squared, swiss)
+summary(lm2)
+```
+
+По сути это классическое квадратное уравнение
+
+Examination --- стало не значимым предиктором
+
+Examination_squared --- значимый
+
+Рассмотрим разницу между двумя моделями
+
+```{r}
+anova(lm2, lm1)
+```
+
+Разница оказывается значимой
+
+Добавим несколько переменных в исходный датасет
+
+```{r}
+swiss$lm1_fitted <- lm1$fitted
+swiss$lm2_fitted <- lm2$fitted
+swiss$lm1_resid <- lm1$resid
+swiss$lm2_resid <- lm2$resid
+swiss$obs_number <- 1:nrow(swiss)
+```
+
+Построим графики. Красная линия --- линейная модель. Синия квадратичная
+
+```{r}
+ggplot(swiss, aes(x = Examination, y = Education)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(x = Examination, y = lm1_fitted), col = 'red', lwd=1) +
+  geom_line(aes(x = Examination, y = lm2_fitted), col = 'blue', lwd=1)
+```
+
+Построим график в нём будут остатки и предсказанные значения от модели номер 1
+
+```{r}
+ggplot(swiss, aes(x = lm1_fitted, y = lm1_resid)) + 
+  geom_point() + 
+  geom_hline(aes(yintercept  = 0, col = 'red'))
+```
+
+Остатки распределены по какой-то прослеживаемой зависимости.
+Построим график в нём будут остатки и предсказанные значения от модели номер 2.
+
+```{r}
+ggplot(swiss, aes(x = lm2_fitted, y = lm2_resid)) + 
+  geom_point() + 
+  geom_hline(aes(yintercept  = 0, col = 'red'))
+```
+
+Остатки примерно равномерно распределены.
+
+### Диагностика модели. Независимость остатков
+
+Независимость остатков --- предполагает, что все наблюдения не сгруппированы по отдельным наблюдениям.
+
+Нужно построить график в котором по оси икс номера наблюдений, а по оси игрек остатки от модели.
+
+```{r}
+ggplot(swiss, aes(x = obs_number, y = lm1_resid)) + 
+  geom_point(size = 3) + geom_smooth()
+
+ggplot(swiss, aes(x = obs_number, y = lm2_resid)) + 
+  geom_point(size = 3) + geom_smooth()
+```
+
+В принципе нет группировок, но есть некоторые тренды.
+
+### Диагностика модели. Гомоскедастичность
+
+Разброс ошибок должен быть одинаков на протяженнии всего вектора.
+
+Посмотрим разброс остатков.
+
+```{r}
+# Немного разные распределения
+ggplot(swiss, aes(x = lm1_fitted, y = lm1_resid)) + 
+  geom_point(size = 3)
+
+ggplot(swiss, aes(x = lm2_fitted, y = lm2_resid)) + 
+  geom_point(size = 3)
+```
+
+### Задача
+
+Функция gvlma() из библиотеки gvlma позволяет получить оценку выполнения основных допущений линейной регрессии. В качестве аргумента она принимает объект, в который сохранена модель. Можно задать формулу модели прямо в функции gvlma. Чтобы увидеть основные статистики, нужно выполнить команду summary для объекта, созданного с помощью функции gvlma. 
+
+
+
+```{r}
+homosc <- read_csv("homosc.csv")
+
+x <- gvlma(DV ~ IV, data = homosc)
+summary(x)
+
+```
+
+### Диагностика модели. Нормальность распределения остатков
+
+Построение
+
+```{r}
+ggplot(swiss, aes(x = lm1_resid)) + 
+  geom_histogram(binwidth = 4, fill = 'white', col = 'black')
+```
+
+распределение немного скошено влево
+
+Можно посмотреть формальные тесты.
+
+```{r}
+qqnorm(lm1$residuals)
+qqline(lm1$residuals)
+
+shapiro.test(lm1$residuals)
+
+
+ggplot(swiss, aes(x = lm2_resid)) + 
+  geom_histogram(binwidth = 4, fill = 'white', col = 'black')
+
+qqnorm(lm2$residuals)
+qqline(lm2$residuals)
+
+shapiro.test(lm2$residuals)
+
+```
+
+Всё распределение остатков не нормально.
+
+### Задача
+
+Напишите функцию resid.norm, которая тестирует распределение остатков от модели на нормальность при помощи функции shapiro.test и создает гистограмму при помощи функции ggplot() с красной заливкой "red", если распределение остатков значимо отличается от нормального (p < 0.05), и с зелёной заливкой "green" - если распределение остатков значимо не отличается от нормального. 
+
+На вход функция получает регрессионную модель. Функция возвращает переменную, в которой сохранен график ggplot.
+
+В поле для ответа не нужно создавать никаких дополнительных объектов, только напишите функцию  resid.norm.
+
+
+```{r}
+fit <- lm(mpg ~ disp, mtcars)
+
+resid.norm <- function(mod){
+  ifelse(shapiro.test(mod$residuals)$p.value < 0.05,
+         return(ggplot(mod, aes(x = mod$residuals)) + geom_histogram(binwidth = 0.5, fill = 'red')),
+         return(ggplot(mod, aes(x = mod$residuals)) + geom_histogram(binwidth = 0.5, fill = 'green'))
+         )
+}
+
+resid.norm(fit)
+
+# Чуть более элегантное решение
+
+resid.norm <- function(fit) {    
+	resid.norm.pv <- shapiro.test(fit$residuals)$p.value    
+	plt <- ggplot(data.frame(fit$model), aes(x = fit$residuals)) +    
+		geom_histogram(fill = ifelse(resid.norm.pv < 0.05, 'red', 'green'))    
+	return(plt)}
+
+```
+
+### Задача
+
+Ещё одной проблемой регрессионных моделей может стать мультиколлинеарность - ситуация, когда предикторы очень сильно коррелируют между собой. Иногда корреляция между двумя предикторами может достигать 1, например, когда два предиктора - это одна и та же переменная, измеренная в разных шкалах (x1 - рост в метрах, x2 - рост в сантиметрах)  
+
+Проверить данные на мультиколлинеарность можно по графику pairs() и посчитав корреляцию между всеми предикторами c помощью функции cor.
+
+Напишите функцию high.corr, которая принимает на вход датасет с произвольным числом количественных переменных и возвращает вектор с именами двух переменных с максимальным абсолютным значением коэффициента корреляции. 
+
+Сначала распишу по порядку, что за что отвечает
+
+```{r}
+swiss[sapply(swiss, is.numeric)] # Берём только численные значения
+
+cor(swiss[sapply(swiss, is.numeric)]) # Строим матрицу корреляций
+
+qw <- abs(cor(swiss[sapply(swiss, is.numeric)])) # Берём абсолютные значения 
+
+diag(qw) <- 0 # Убиваем единицу по диагонали
+
+sort(qw, decreasing = TRUE)[1] # Отсортируем матрицу и возьмём первое значение --- это будет максимальный по модулю коэффициент корреляции
+
+which(qw == sort(qw, decreasing = TRUE)[1], arr.ind = TRUE) # Посмотрим в каких колонках и строках распологается этот максимальный коэффициент
+
+rownames(which(qw == sort(qw, decreasing = TRUE)[1], arr.ind = TRUE)) # возьмём имена строк у полученной на предыдущем шаге таблицы
+```
+
+А теперь уложим это в одну функцию
+
+```{r}
+high.corr <-  function(data){
+  abs_cor <- abs(cor(data[sapply(data, is.numeric)]))
+  diag(abs_cor) <- 0
+  return(rownames(which(abs_cor == sort(abs_cor, decreasing = TRUE)[1], arr.ind = TRUE)))
+}
+```
+
 
