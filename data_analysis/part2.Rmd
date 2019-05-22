@@ -1,0 +1,22 @@
+---
+title: "data_analysis"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Этап 2
+
+## Общая информация о курсе
+
+
+```{r}
+library(tidyverse)
+```
+
+
+## Функции семейства apply
+
+
+
+
