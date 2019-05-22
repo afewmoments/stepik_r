@@ -228,13 +228,11 @@ na_rm <- function(x){
 
 na_rm(test_data)
 
-na_rm  <- function(x){    
-	na_to_mean  <- function(v){    
-		v[is.na(v)]  <- mean(v , na.rm = T)    
-		return(v)}    
-	result  <- as.data.frame(apply(x, 2, na_to_mean))}
+# Решение через ifelse
 
-
+na_rm <- function(x){
+  y <- apply(x,2,function(x) ifelse(is.na(x),mean(x,na.rm=T),x))
+  return(as.data.frame(y))}
 
 ```
 
