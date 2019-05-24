@@ -529,5 +529,53 @@ my_names(test_data, names)
 
 ```{r}
 aggregate(mpg ~ cyl + am, mtcars, mean)
+
+test_data <- read.csv("https://stepic.org/media/attachments/course/724/hard_task.csv")
+head(test_data)
+str(test_data)
+
+correct_answer <- read.csv("https://stepic.org/media/attachments/course/724/hard_task_ans.csv")
+head(correct_answer)
+str(correct_answer)
+
+```
+
+Итак, ваша задача — создать в данных новую числовую переменную is_outlier, которая будет принимать значение 1, если наблюдение в этой строке является выбросом в своей группе, и 0, если не является.
+
+Под выбросами будем понимать наблюдения, отклоняющиеся от среднего значения в группе более чем на два стандартных отклонения этой группы. 
+
+Поясню условие на примере данных ToothGrow. Сначала переведем группирующие переменные в фактор. Одна из группирующих переменных имеет  две градации, другая три, значит все наши наблюдения разбиваются на шесть групп. Ваша задача проанализировать каждую группу и отметить там выбросы, если они есть. Иными словами, сначала мы берем все наблюдения для которых supp = VC и dose = 0.5. В этой группе смотрим, есть ли наблюдения, у которых значения len отклоняются от среднего в этой группе больше чем на два sd. И так повторяем для оставшихся трех групп. В итоге в новой переменной is_outlier будет храниться информация - является ли наблюдение выбросом не по всем данным, а только в своей группе.
+
+А также: порядок переменных является случайным, единственная количественная переменная может быть первым столбцом, может последним и т.д.
+
+```{r}
+q1 <- aggregate(x ~ factor_2 + factor_3, test_data, function(s){
+  ifelse(abs(s - mean(s)) > 2 * sd(s), 1,0)
+})
+
+
+test_data %>%
+  group_by_at(vars(one_of(colnames(.[sapply(., is.factor)])))) %>%
+  mutate(is_outlier = ifelse(abs(x - mean(x)) > 2 * sd(x), 1,0))
+
+t <- test_data[sapply(test_data, is.numeric)]
+str(t)
+
+```
+
+
+```{r}
+data = data.frame(
+    asihckhdoydkhxiydfgfTgdsx = sample(LETTERS[1:3], 100, replace=TRUE),
+    a30mvxigxkghc5cdsvxvyv0ja = sample(LETTERS[1:3], 100, replace=TRUE),
+    value = rnorm(100)
+)
+
+columns = names(data)[-3]
+
+df1 <- data %>%
+  group_by_at(vars(one_of(columns))) %>%
+  summarize(Value = mean(value))
+
 ```
 
