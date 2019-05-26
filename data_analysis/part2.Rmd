@@ -677,4 +677,154 @@ get_p_value <- function(test_list){
 
 ## Работа с данными при помощи dplyr
 
+Уже знакомая библиотека, которую мы уже знаем.
+ 
+```{r}
+my_data <- data_frame(x = rnorm(10000), y = rnorm(10000), 
+                      f = factor(rep(1:2, 5000)))
+
+# а ниже классический дата.фрейм
+my.data <- data.frame(x = rnorm(10000), y = rnorm(10000), 
+                      f = factor(rep(1:2, 5000)))
+```
+
+В чём различия? 
+
+* dplyr --- прерывает излишний вывод, и выводит тип данных
+
+* dplyr --- разрешает называть перменные с пробелами
+
+* dplyr --- разрешает использовать функции внутри функции
+
+```{r}
+my_data_2 <- data_frame(x = rnorm(10), y = abs(x))
+# my.data.2 <- data.frame(x = rnorm(10), y = abs(x))  не работает
+```
+
+### Работа с колонками и строками 
+
+* select --- позволяет отобрать колонки
+
+* slice --- позволяет отобрать строки
+
+
+```{r}
+select(diamonds, 1, 2, 3)
+diamonds[c("cut", "price", "color")]
+
+# Можно  обращаться к столбцам которые содержат t
+select(diamonds, contains("t"))
+
+# step 6 slice rows
+slice(diamonds, c(1, 4, 5))
+diamonds[c(1, 4, 5)]
+```
+
+###  Функция filter
+
+```{r}
+filter(diamonds, carat > 0.3 | color == "J")
+diamonds[diamonds$carat > 0.3 & diamonds$color == "J", ]
+subset(diamonds, carat > 0.3 & color == "J")
+```
+
+###  Функция arrange --- сортировка
+
+```{r}
+arrange(diamonds, desc(price))
+diamonds[order(diamonds$price, diamonds$depth), ]
+```
+
+###  Функция rename и mutate
+
+Тоже уже знакомы
+
+#### Задача
+
+Давайте потренируемся обращаться к данным. Вы можете использовать базовый синтаксис, функции из пакета dplyr или data.table. 
+
+Поработаем с данными diamonds из пакета ggplot2. 
+
+В переменную d сохраните только нeчетные строчки исходных данных diamonds. 
+
+Обратите внимание на функцию seq(). Она может вам пригодиться вам не только в этой задаче.
+
+```{r}
+d <- slice(diamonds, seq(1, nrow(diamonds), 2))
+```
+
+#### Задача
+
+Потренируемся использовать изученные функции. Из данных mtcars отберите только четыре переменные: mpg, hp, am, vs. 
+Оставьте только те наблюдения, для которых значения mpg > 14 и hp > 100. 
+Отсортируйте получившиеся данные по убыванию переменной mpg и возьмите только первые 10 строчек. 
+Переменную mpg переименуйте в Miles per gallon, а переменную hp в  Gross horsepower (обратите внимание, dplyr позволит нам создать пременные с пробелами в названии). Получившийся dataframe сохраните в переменную my_df. 
+
+```{r}
+my_df <- mtcars %>% 
+  select(mpg, hp, am, vs) %>% 
+  filter(mpg > 14 & hp > 100) %>% 
+  arrange(desc(mpg)) %>% 
+  slice(1:10) %>% 
+  rename("Miles per gallon" = mpg,
+         "Gross horsepower" = hp)
+mtcars %>% 
+  slice(1:10)
+```
+
+## Работа с данными при помощи dplyr продолжение
+
+Есть полезная функция mutate_each
+
+```{r}
+d <- as_data_frame(matrix(rnorm(30), ncol = 5))
+
+mutate_each(d, funs(ifelse(. < 0, 0, .)))
+```
+
+В funs --- точка «.» означает колонку данных
+Мы применяем для каждой колонке данных применим функцию. Её преимуществом является то, что она возвращает датафрейм
+
+#### Задача
+
+Напишите функцию, all_to_factor, которая преобразует dataframe, переводя все его переменные в фактор.
+
+```{r}
+all_to_factor <- function(x){
+  mutate_each(x, funs(as.factor(.)))
+}
+
+all_to_factor(mtcars)
+```
+
+#### Задача
+
+В этом задании от вас потребуется написать функцию для предобработки данных log_transform. В статистике часто трансформируют исходные переменные. Например, используют значение натурального логарифма исходной переменной.
+
+Ваша задача написать функцию, которая получает на вход dataframe  с произвольным числом переменных разных типов. На первом этапе функция должна выполнить предобработку числовых переменных. Т.к. значение логарифма мы можем рассчитать только для положительных чисел. Для этого сделаем центрирование всех переменных (Rescaling), только еще добавим единичку, чтобы у нас не осталось нулей:
+
+После того как мы масштабировали каждую переменную, осталось рассчитать значение натурального логарифма каждого наблюдения (функция log) и вернуть новый dataframe. 
+
+```{r}
+test_data <- data_frame(V1 = rnorm(5),
+                        V2 = rnorm(5),
+                        V3 = rnorm(5),
+                        V4 = c("A","B","B","B","B"))
+
+
+log_transform <- function(test_data){      
+rescaling <- function(x){      
+log((x - min(x)) / (max(x) - min(x)) + 1)}      
+num_var <- sapply(test_data, is.numeric)      
+test_data[num_var] <- mutate_each(test_data[num_var], funs(rescaling))      
+return(test_data)}
+
+
+
+log_transform <- function(test_data){
+test_data %>% mutate_if(is.numeric, funs(log(((. - min(.)) /(max(.) - min(.))) + 1)))
+}
+
+
+```
 
