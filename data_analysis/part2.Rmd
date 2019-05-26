@@ -645,20 +645,36 @@ return('There are no normal variables in the data')}}
 Функция должна возвращать список, где каждый элемент это вектор, состоящий из t - значения, числа степеней свобод (df) и значения p - value.
 
 ```{r}
-i <- iris[sapply(iris, is.numeric)]
-
-l <- sapply(i, t.test, mu = 4, simplify = FALSE)
-
-unlist(l)
-
-l$Sepal.Length$statistic
-l$Sepal.Length$parameter
-l$Sepal.Length$p.value
-
-mapply(paste, l, list("statistic", "parameter", "p.value"))
-
-mapply(paste, list("row", "col"), list(1:100, 1:200), sep = "_")
-
-  
+one_sample_t <- function(test_data, general_mean){
+  # отбираем только числовые переменные
+  numeric_data <- test_data[sapply(test_data, is.numeric)]
+  # к числовым переменным применяем t.test и отбираем интересующие параметры
+  # выводим списком, как это требуется в задании
+  lapply(numeric_data, function(x) c(t.test(x, mu = general_mean)$statistic, 
+                                     t.test(x, mu = general_mean)$parameter, 
+                                     t.test(x, mu = general_mean)$p.value))
+  }
 ```
+
+Фактически всё тоже самое, но в более элегантной форме:
+
+```{r}
+one_sample_t <- function(data, mean) {
+    lapply(data[sapply(data, is.numeric)],
+           function(x) unlist(t.test(x, mu = mean)[c("statistic", "parameter", "p.value")]))
+}
+```
+
+### Задача
+
+Итак, ваша задача, написать функцию get_p_value, которая получает на вход список (назовем его главным списком), каждый элемент этого списка тоже список - результат выполнения функции shapiro.test (смотри пример normality_tests). Ваша задача из каждого элемента главного списка вытащить только p - value. В итоге функция возвращает список где каждый элемент - одно значение - p - value (как в примере normality_tests_p).
+
+```{r}
+get_p_value <- function(test_list){
+  lapply(test_list, function(x) x$p.value)
+}
+```
+
+## Работа с данными при помощи dplyr
+
 

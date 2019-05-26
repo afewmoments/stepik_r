@@ -78,7 +78,7 @@ factorial(43) / (factorial(6) * factorial(43-6))
 Введём тестовый набор данных
 
 ```{r}
-mydata <- read.csv("evals.csv")
+mydata <- read.csv("data/evals.csv")
 ```
 
 
@@ -461,7 +461,7 @@ ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
 Данные для работы на этом уроке
 
 ```{r}
-df <- read_csv("grants.csv")
+df <- read_csv("data/grants.csv")
 
 # сделаем замены на фактор и понятные описания
 df$status <- as.factor(df$status)
@@ -736,7 +736,7 @@ t_stat <- t.test(len ~ supp, correct_data)$statistic
 (В качестве десятичного разделителя используйте запятую, например: 123,54)
 
 ```{r}
-drugs <- read.csv("lekarstva.csv")
+drugs <- read.csv("data/lekarstva.csv")
 
 str(drugs)
 
@@ -751,7 +751,7 @@ t.test(drugs$Pressure_before, drugs$Pressure_after, paired = TRUE)[1]
 Обратите внимание, что по умолчанию в t.test стоит var.equal = FALSE, так как мы будем применять его только в случае гомогенности дисперсий, измените значение этого параметра на  var.equal = TRUE.
 
 ```{r}
-t <- read.table("dataset_11504_15.txt")
+t <- read.table("data/dataset_11504_15.txt")
 
 bartlett.test(V1 ~ V2, t)
 
@@ -785,7 +785,7 @@ t.test(V1 ~ V2, s, var.equal = FALSE)[3]
 
 
 ```{r}
-df <- read.table("dataset_11504_16.txt")
+df <- read.table("data/dataset_11504_16.txt")
 p <- bartlett.test(df)$p.value
 if (p < 0.05) {
   p_res <- t.test(df$V1, df$V2)
@@ -821,7 +821,7 @@ if (p < 0.05) {
 Пример данных --- сравнение цен в разных магазинах на разные товары
 
 ```{r}
-mydata <- read.csv('shops.csv')
+mydata <- read.csv('data/shops.csv')
 str(mydata)
 ```
 
@@ -952,7 +952,7 @@ TukeyHSD(fit_iris)
 Результаты нескольких психотерапий
 
 ```{r}
-mydata2 <- read.csv('therapy_data.csv')
+mydata2 <- read.csv('data/therapy_data.csv')
 str(mydata2)
 ```
 
@@ -1030,7 +1030,7 @@ summary(fit3b)
 
 
 ```{r}
-pills <- read.csv('Pillulkin.csv')
+pills <- read.csv('data/Pillulkin.csv')
 pills$patient <- as.factor(pills$patient)
 str(pills)
 
@@ -1832,7 +1832,7 @@ ggplot(swiss, aes(x = lm2_fitted, y = lm2_resid)) +
 
 
 ```{r}
-homosc <- read_csv("homosc.csv")
+homosc <- read_csv("data/homosc.csv")
 
 x <- gvlma(DV ~ IV, data = homosc)
 summary(x)
@@ -1979,7 +1979,7 @@ $$p_i = \frac{exp(\beta_0 + \beta_1 x_{1,i} + \beta_2 x_{2,i} + ... + \beta_k x_
 рассммотрим искусственный набор данных
 
 ```{r}
-my_df <- read.csv("train.csv", sep=";")
+my_df <- read.csv("data/train.csv", sep=";")
 str(my_df)
 ```
 
@@ -2143,7 +2143,7 @@ mean(my_df$correct)
 Ну и разумеется, мы можем использовать полученные значения, для того чтобы предсказывать на новых данных. 
 
 ```{r}
-test_df  <- read.csv("test.csv", sep = ";")
+test_df  <- read.csv("data/test.csv", sep = ";")
 test_df$hon  <- NA
 
 # У меня не сработало, но код должен быть такой
@@ -2157,7 +2157,7 @@ test_df$hon  <- NA
 Про часть испытуемых известно, поступили они в университет или нет (переменная admit, 1 = поступили, 0 = не поступили), про остальных таких данных нет (NA). Описание данных (обратите на него внимание при проведении подсчётов):
 
 ```{r}
-data <- read_csv("data.csv")
+data <- read_csv("data/data.csv")
 ```
 
 По имеющимся данным в переменной admit постройте логистическую регрессионную модель, предсказывающую результат поступления по престижности учебного заведения среднего образования (переменная rank, 1 — наиболее престижное, 4 — наименее престижное) и результатов GPA (переменная gpa) с учётом их взаимодействия. Примените эту модель к той части данных, где результат поступления неизвестен.
