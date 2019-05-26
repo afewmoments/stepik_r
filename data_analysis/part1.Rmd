@@ -18,13 +18,7 @@ library(gvlma)
 library(ROCR)
 ```
 
-Обновление
 
-```{r}
-# install.packages("Hmisc")
-# library(installr)
-# updateR()
-```
 
 
 # Этап 1
