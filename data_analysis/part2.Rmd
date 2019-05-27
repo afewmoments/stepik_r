@@ -824,7 +824,41 @@ return(test_data)}
 log_transform <- function(test_data){
 test_data %>% mutate_if(is.numeric, funs(log(((. - min(.)) /(max(.) - min(.))) + 1)))
 }
+```
+
+
+#### Задача
+
+
+Скачайте файл glacier.csv, если вы ещё этого не сделали, и познакомьтесь с ним поближе. Попробуйте выяснить, о каких ледниках идёт речь в тексте внизу. Можно работать непосредственно в консоли, а можно решать при помощи inline кода, который хорошо подходит в данном случае, если такой текст вы захотите включить в отчёт.
+
+```{r}
+glacier <- read_delim("https://raw.githubusercontent.com/tonytonov/Rcourse/master/R%20markdown/demos/glacier.csv", delim = ",", skip = 1, ) %>%
+  separate(GEO, c("name", "coord"), sep = " - ")
+
+# Среди шести изучаемых ледников самую короткую историю наблюдений имеет
+
+glacier %>%
+  group_by(name) %>%
+  summarise(n = min(Ref_Date)) %>% 
+  arrange(desc(n))
+  
+# ледник, для которого медианное значение изменения (переменная Value для Annual Mass Balance) наиболее близко к нулю, называется
+
+glacier %>%
+  filter(MEASURE == "Annual mass balance", Value != "..") %>% 
+  mutate(Value = as.double(Value)) %>% 
+  group_by(name) %>% 
+  summarise(n = median(Value)) %>% 
+  arrange(desc(n))
+
+# Единственное пропущенное значение содержит история наблюдений ледника
+
+glacier %>%
+  filter(Value == "..")
+
 
 
 ```
+
 
