@@ -893,3 +893,30 @@ dataset %>%
 }
 ```
 
+#### Задача
+
+Напишите функцию, to_factors, которая получает на вход dataframe  с произвольным числом количественных переменных и вектор с номерами колонок, которые нужно перевести в фактор.
+
+Для перевода числовых колонок в фактор будем использовать следующий принцип, если наблюдение больше среднего всей переменной то 1, иначе 0.
+
+```{r}
+test <- mtcars[1:4]
+
+# Желаемое состояние
+
+test[c(1, 3)] <- test[c(1, 3)] %>%
+  mutate(mpg = as.factor(ifelse(mpg > mean(mpg), 1, 0)),
+         disp = as.factor(ifelse(disp > mean(disp), 1, 0)))
+
+
+# Переводим в функцию при помощи mutate_each() 
+
+to_factors <- function(test_data, factors){
+test_data[factors] <- mutate_each(test_data[factors], funs(as.factor(ifelse(. > mean(.), 1, 0))))
+return(test_data)
+}
+
+to_factors(mtcars[1:4], factors = c(1, 3))
+
+```
+
