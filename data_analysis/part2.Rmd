@@ -957,8 +957,6 @@ diamonds %>%
 
 ## Грамматика ggplot2, функция qplot
 
-
-
 #### Задача
 
 Используя функцию qplot, постройте гистограмму переменной depth из данных diamonds. Сохраните график в переменную depth_hist.
@@ -997,3 +995,136 @@ qplot(x = x, data = diamonds, geom = "density", color = cut)
 ```{r}
 qplot(x = color, y = price, data = diamonds, geom = "violin")
 ```
+
+## Функция ggplot и различные geoms
+
+#### Задача
+
+Давайте потренируемся комбинировать различные geoms на одном графике. Используя данные mtcars скомбинируем два варианта отображения количественных данных boxplot и violin plot:
+
+```{r}
+ggplot(mtcars, aes(factor(am), mpg)) +
+  geom_violin() +
+  geom_boxplot(width = 0.2)
+```
+
+#### Задача
+
+Для закрепления результатов поработаем с вымышленными данными о доходах в нескольких магазинах:
+
+sale - число проданных товаров
+shop - номер магазина
+date - год, за который велась статистика
+season - время года
+income - доход магазина
+В последующих заданиях мы визуализируем связи между переменным
+
+```{r}
+sales = read.csv("https://stepic.org/media/attachments/course/724/sales.csv", encoding = "UTF-8")
+str(sales)
+```
+
+#### Задача
+
+Отобразите взаимосвязь между доходом (income) и числом продаж (sale), цветом точек указав номер магазина (shop):
+
+```{r}
+ggplot(sales, aes(income, sale)) + 
+  geom_point(aes(color = shop)) +
+  geom_smooth(method = "lm")
+```
+
+#### Задача
+
+При помощи функции stat_summary постройте график с доверительными интервалами для демонстрации различий в доходах двух магазинов с учетом времени года:
+
+переменная shop - ось x;
+переменная income - ось y;
+переменная season - цвет;
+geom pointrange.
+Сохраните график в переменную my_plot, дополнив предложенный код. Обратите внимание, что доверительные интервалы не накладываются друг на друга! 
+
+```{r}
+ggplot(sales, aes(shop, income, color = season)) +
+stat_summary(fun.data = mean_cl_boot, geom = "pointrange", position = position_dodge(width = .5))
+```
+
+#### Задача
+
+Теперь давайте отобразим на графике различия в продажах (переменная sale), в зависимости от:
+
+года (date) - ось x;
+и номера магазина (shop) - цвет.
+Дополните предложенный код, чтобы получился график как в примере ниже. Используйте функцию mean_cl_boot для построения доверительных интервалов.Вам также понадобится использовать три geoms: errorbar, point, line. Используйте их прямо внутри функции stat_summary(). 
+
+Данные уже сохранены в переменную sales. Нажмите, начать решение, чтобы увидеть заготовку кода.
+
+```{r}
+ggplot(sales, aes(date, sale, color = shop))+
+stat_summary(fun.data = mean_cl_boot, geom = "errorbar", position = position_dodge(width = .5)) + # добавим стандартную ошибку
+stat_summary(fun.data = mean_cl_boot, geom = "point", position = position_dodge(width = .5)) + # добавим точки
+stat_summary(fun.data = mean_cl_boot, geom = "line", position = position_dodge(width = .5))
+```
+
+## Facet - способы группировки данных на графике
+
+#### Задача
+
+Потренируемся с разбиением графика на подгруппы! Используя facet_grid постройте следующий график и сохраните его в переменную mpg_facet.
+
+```{r}
+mtcars <- mutate(mtcars, 
+                 am = factor(am, labels = c("A", "M")), 
+                 vs = factor(vs, labels = c("V", "S")))
+
+ggplot(mtcars, aes(mpg)) +
+  geom_dotplot() +
+  facet_grid(am ~ vs)
+```
+
+#### Задача
+
+Используя данные iris, постройте график плотности для переменной Sepal.Length. Разбейте график на части по переменной Species при помощи facet_wrap. Результат сохраните в переменную sl_wrap.
+
+
+```{r}
+ggplot(iris, aes(Sepal.Length)) +
+  geom_density() +
+  facet_wrap(~Species)
+```
+
+#### Задача
+
+Используя данные Iris, постройте график, иллюстрирующий взаимосвязь переменных Sepal.Length и Sepal.Width внутри каждого вида (переменной Species), при помощи facet_wrap().
+
+В этом задании вам потребуется использовать два geom:
+
+geom_point - для отображения отдельных наблюдений,
+geom_smooth - для добавления сглаживания.
+
+```{r}
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~Species)
+```
+
+#### Задача
+
+«Отряд самоубийц» уже посмотрели? Пишите в комментариях, как вам! У меня вот смешанные чувства вызвала эта команда суперзлодеев. Собрали самых интересных персонажей вселенной и отправили их в одну локацию весь фильм ходить, перебрасываясь односложными фразами. Джокера совсем не показали, все так ждали Джареда Лето в этой роли, а он появился, считайте, в двух эпизодах! К чему это я? Поговорим о кино!
+
+Вы можете скачать данные myMovieData (жмите на ссылку), в которых представлена различная информация о голливудских фильмах с 2002 по 2005: тип жанр, бюджет и год выхода на экраны. Давайте построим следующий график, чтобы выяснить есть ли различия в бюджетах фильмов разного жанра из года в год. Cохраните результат в переменную my_plot.
+
+ось x - переменная Type
+ocь y - переменная Budget
+facet - переменная Year (используйте facet_grid)
+
+```{r}
+myMovieData <- read_csv("data/myMovieData.csv")
+
+ggplot(myMovieData, aes(Type, Budget)) +
+  geom_boxplot() +
+  facet_grid(~Year) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
