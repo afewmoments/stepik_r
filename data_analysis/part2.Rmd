@@ -1292,11 +1292,37 @@ NB! не стоит хардкодить количестве строк в да
 
 ```{r}
 teapot <- read_delim("data/teapot.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+i<- seq(0,length(teapot$z)-1,3)
+j<- seq(1,length(teapot$z),3)
+k<- seq(2,length(teapot$z),3)
 
-plot_ly(teapot, type="mesh3d", x = ~x, y = ~y, z = ~z, alphahull = 0)
+plot_ly(teapot, type="mesh3d", 
+        x = ~x, y = ~y, z = ~z,
+        i = ~i, j = ~j, k = ~k,
+        alphahull = 0)
+
+teapot$z
+teapot[[1]]
 
 
+make.fancy.teapot <- function(teapot.coords) {
+i<- seq(0,length(teapot.coords[[1]])-1,3)
+j<- seq(1,length(teapot.coords[[1]]),3)
+k<- seq(2,length(teapot.coords[[1]]),3)
 
+plot_ly(teapot.coords, type="mesh3d", 
+        x = ~x, y = ~y, z = ~z,
+        i = ~i, j = ~j, k = ~k,
+        alphahull = 0)
+}
+
+make.fancy.teapot <- function(teapot.coords) {
+    i = seq(0,nrow(teapot.coords)-1,3)
+    plot_ly(teapot.coords, x = x, y = y,   z = z, 
+                           i = i, j = i+1, k = i+2, type = "mesh3d")
+}
+
+make.fancy.teapot(teapot)
 ```
 
 
