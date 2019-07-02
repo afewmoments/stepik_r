@@ -1018,6 +1018,34 @@ purchases[quantity > 0][, sum(price * quantity), by = ordernumber][,median(V1)]
 
 ```
 
+#### Задача
+
+Создайте функцию get.category.ratings, которая будет возвращать суммарный оборот (с учетом скидок) каждой категории , и количество купленных предметов по таблице покупок и таблице принадлежности товара к категории. Если купленный товар принадлежит нескольким категориям, его необходимо учитывать во всех. При решении используйте ключи.
+
+
+```{r}
+product.category <- data.table(product_id = c(1,1,2,2,3),
+                               category_id = c(1,2,1,3,3))
+
+purchases <- data.table(product_id = c(1, 2, 3),
+                        totalcents = c(100, 200, 300),
+                        quantity = c(1, 1, 3))
+
+
+get.category.ratings <- function(purchases, product.category) {
+  setkey(purchases, product_id)
+  setkey(product.category, product_id)
+f <- merge(product.category, purchases)[, .(totalcents=sum(totalcents)), by = category_id]
+g <- merge(product.category, purchases)[, .(quantity=sum(quantity)), keyby = category_id]
+f[g, on = "category_id"]
+}
+
+get.category.ratings(purchases, product.category)
+
+```
+
+
+
 
 ## Грамматика ggplot2, функция qplot
 
