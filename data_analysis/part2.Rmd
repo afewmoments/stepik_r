@@ -956,6 +956,69 @@ diamonds %>%
 
 ## Data.table
 
+```{r}
+library(data.table)
+
+products <- fread("data/products.csv", colClasses = c(price = "double"))
+
+
+```
+
+#### Задача
+
+Напишите функцию filter.expensive.available, которая принимает на вход products (объект типа data.table) и вектор названий брендов, и возвращает только те строчки, которые соответствуют товарам, цена которых больше или равна 5000 рублей, доступны на складе, и принадлежат одному из переданных брендов.
+
+```{r}
+sample.products <- data.table(price = c(10000, 600000, 700000, 1000000),
+                              brand = c("a", "b", "c", "d"),
+                              available = c(T, T, F, T))
+
+filter.expensive.available <- function(products, brands) {
+  products[price/100 > 5000 & available == T][brand %in% brands]
+}
+
+filter.expensive.available(sample.products, c("a", "c", "d"))
+```
+
+#### Задача
+
+Создайте функцию ordered.short.purchase.data, которая будет принимать purchases, объект data.table, и возвращать таблицу только со столбцами с номером заказа и ID продукта.
+Упорядочите результат по убыванию стоимости купленного товара. Возвраты (записи с отрицательным количеством предметов в позиции) надо удалить.
+
+```{r}
+sample.purchases <- data.table(price = c(100000, 6000, 7000, 5000000),
+                               ordernumber = 1:4,
+                               quantity = c(1,2,1,-1),
+                               product_id = 1:4)
+
+ordered.short.purchase.data <- function(purchases) {
+  purchases[order(-price)][quantity > 0][, list(ordernumber, product_id)]
+}
+
+```
+
+#### Задача
+Напишите функцию purchases.median.order.price, у которой один аргумент: purchases, и которая возвращает медианную стоимость заказа (число).
+
+Группировку стоит проводить с помощью data.table. Записи с неположительным количеством купленных товаров (возвраты) игнорировать.
+
+Обратите внимание, что одному заказу может соответствовать несколько записей – «позиций» с одинаковым ordernumber, и что при расчете стоимости заказа надо учитывать ситуации, когда пользователь купил несколько товаров одного типа (их количество указано в quantity).
+
+
+```{r}
+sample.purchases <- data.table(price = c(100000, 6000, 7000, 5000000),
+                               ordernumber = c(1,2,2,3),
+                               quantity = c(1,2,1,-1),
+                               product_id = 1:4)
+
+
+purchases.median.order.price <- function(purchases) {
+purchases[quantity > 0][, sum(price * quantity), by = ordernumber][,median(V1)]
+}
+
+```
+
+
 ## Грамматика ggplot2, функция qplot
 
 Куча расширений для ggplot <http://www.ggplot2-exts.org/gallery/>
