@@ -1044,6 +1044,32 @@ get.category.ratings(purchases, product.category)
 
 ```
 
+#### Задача
+
+Напишите функцию, которая будет с помощью := добавлять столбец «price.portion», содержащий процент стоимости товара в заказе, с двумя знаками после запятой (нули после запятой не опускать). Проверяться будет возвращаемая из функции таблица. Тип нового столбца - character (строка). Записи с неположительным количеством товаров убрать перед расчётом.
+
+```{r}
+sample.purchases <- data.table(price = c(100, 300, 50, 700, 30),
+                               ordernumber = c(1,1,1,2,3),
+                               quantity = c(1,1,2,1,-1),
+                               product_id = 1:5)
+
+sample.purchases[quantity > 0][, price.portion := (quantity * price), by = ordernumber]
+
+sample.purchases[, .(price)]
+
+mark.position.portion <- function(purchases) {
+  purchases <- purchases[quantity > 0][, price.portion := (quantity * price) / sum(quantity * price) * 100, by = ordernumber]
+  #purchases[, sapply(.price.portion, sprintf("%.2f", price.portion))]
+  print(purchases)
+}
+
+sprintf("%.2f", pi)
+
+sapply(sample.purchases[, .(price)], function(x) sprintf("%.2f",x))
+
+mark.position.portion(sample.purchases)
+```
 
 
 
