@@ -1054,25 +1054,25 @@ sample.purchases <- data.table(price = c(100, 300, 50, 700, 30),
                                quantity = c(1,1,2,1,-1),
                                product_id = 1:5)
 
-sample.purchases[quantity > 0][, price.portion := (quantity * price), by = ordernumber]
+sample.purchases[quantity > 0][quantity, sprintf("%.2f",x)]
 
 sample.purchases[, .(price)]
 
 mark.position.portion <- function(purchases) {
-  purchases <- purchases[quantity > 0][, price.portion := (quantity * price) / sum(quantity * price) * 100, by = ordernumber]
- purchases$price.portion <- sapply(purchases[, .(price.portion)], function(x) sprintf("%.2f",x))
-  as.data.table(purchases)
- print(purchases)
+  purchases <- purchases[quantity > 0][, price.portion := sprintf("%.2f",(quantity * price) / sum(quantity * price) * 100), by = ordernumber]
+  print(purchases)
 }
 
-sprintf("%.2f", pi)
+?data.table
 
-sample.purchases$price <-  sapply(sample.purchases[, .(price)], function(x) sprintf("%.2f",x))
+sample.purchases <- sample.purchases[price<100,
+         ordernumber11 := paste0(ordernumber, " ( ", price, " руб.)")]
 
-str(sample.purchases)
+print(sample.purchases)
 
-is.data.table(mark.position.portion(sample.purchases))
+mark.position.portion(sample.purchases)
 
+sample.purchases[, price := sprintf("%.2f",price), by=ordernumber]
 
 str(sample.purchases)
 is.data.table(sample.purchases)
