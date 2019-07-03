@@ -1060,15 +1060,22 @@ sample.purchases[, .(price)]
 
 mark.position.portion <- function(purchases) {
   purchases <- purchases[quantity > 0][, price.portion := (quantity * price) / sum(quantity * price) * 100, by = ordernumber]
-  #purchases[, sapply(.price.portion, sprintf("%.2f", price.portion))]
-  print(purchases)
+ purchases$price.portion <- sapply(purchases[, .(price.portion)], function(x) sprintf("%.2f",x))
+  as.data.table(purchases)
+ print(purchases)
 }
 
 sprintf("%.2f", pi)
 
-sapply(sample.purchases[, .(price)], function(x) sprintf("%.2f",x))
+sample.purchases$price <-  sapply(sample.purchases[, .(price)], function(x) sprintf("%.2f",x))
 
-mark.position.portion(sample.purchases)
+str(sample.purchases)
+
+is.data.table(mark.position.portion(sample.purchases))
+
+
+str(sample.purchases)
+is.data.table(sample.purchases)
 ```
 
 
