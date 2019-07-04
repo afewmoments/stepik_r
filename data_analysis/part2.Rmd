@@ -1060,22 +1060,7 @@ sample.purchases[, .(price)]
 
 mark.position.portion <- function(purchases) {
   purchases <- purchases[quantity > 0][, price.portion := sprintf("%.2f",(quantity * price) / sum(quantity * price) * 100), by = ordernumber]
-  print(purchases)
 }
-
-?data.table
-
-sample.purchases <- sample.purchases[price<100,
-         ordernumber11 := paste0(ordernumber, " ( ", price, " руб.)")]
-
-print(sample.purchases)
-
-mark.position.portion(sample.purchases)
-
-sample.purchases[, price := sprintf("%.2f",price), by=ordernumber]
-
-str(sample.purchases)
-is.data.table(sample.purchases)
 ```
 
 
